@@ -38,6 +38,9 @@ def index(request):
     if context['kanji'] == context['gana'] and context['visible'] == 'kanji':
         context['visible'] = 'gana'
 
+    if context['visible'] == 'play':
+        context['visible'] = 'gana'
+
     return render(request, 'jplearn/index.html', context)
 
 def audio(request, q):

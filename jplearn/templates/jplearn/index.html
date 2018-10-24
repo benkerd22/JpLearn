@@ -9,9 +9,46 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
         crossorigin="anonymous">
+
+    <style>
+        .footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            /* Set the fixed height of the footer here */
+            height: 60px;
+            line-height: 60px;
+            /* Vertically center the text there */
+            background-color: #f5f5f5;
+        }
+    </style>
 </head>
 
-<body>
+<body style="background:#f5f5f5">
+    <nav class="navbar navbar-dark bg-primary">
+        <a class="navbar-brand" href="#">
+            <!--img src="/docs/4.1/assets/brand/bootstrap-solid.svg" width="30" height="30" class="d-inline-block align-top" alt="" -->JpLearn
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup"
+            aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link" href="#">Home
+                    <span class="sr-only">(current)</span>
+                </a>
+                <a class="nav-item nav-link active" href="#">Word List</a>
+                <a class="nav-item nav-link" href="https://github.com/benkerd22/JpLearn">Github</a>
+            </div>
+            <span class="navbar-text text-right">
+                <p></p>
+                <h6>created by zzd</h6>
+            </span>
+        </div>
+    </nav>
+    <p></p>
+    <p></p>
     <div class="container-fluid">
 
         <audio id="pronunce">
@@ -44,7 +81,10 @@
                                 <button id="play" class="btn btn-light btn-sm">▷</button>
                             </div>
                         </div>
-                        <h6 id="chn" class="collapse multi-collapse"><p></p><em>{{ chn }}</em></h6>
+                        <h6 id="chn" class="collapse multi-collapse">
+                            <p></p>
+                            <em>{{ chn }}</em>
+                        </h6>
                     </div>
                 </div>
                 <div class="row justify-content-between">
@@ -53,6 +93,12 @@
                 </div>
             </div>
         </div>
+
+        <footer class="footer">
+            <div class="container">
+                <p class="text-muted text-center font-weight-light">Powered by <a href="https://www.djangoproject.com/">Django</a></p>
+            </div>
+        </footer>
     </div>
 
     <!-- Optional JavaScript -->
@@ -73,7 +119,7 @@
         let media = document.getElementById("pronunce");
         $("#{{ visible }}").removeClass("collapse multi-collapse");
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             if ("{{ visible }}" == "play") {
                 media.play();
 
@@ -83,16 +129,6 @@
 
         $("#play").click(function (e) {
             media.play();
-        })
-
-        $("#show").click(function (e) {
-            let kanji = document.getElementById("kanji");
-            let gana = document.getElementById("gana");
-            let chn = document.getElementById("chn");
-
-            kanji.classList.remove("invisible");
-            gana.classList.remove("invisible");
-            chn.classList.remove("invisible");
         })
 
         $("#next").click(function (e) {
