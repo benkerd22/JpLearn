@@ -16,8 +16,8 @@
             bottom: 0;
             width: 100%;
             /* Set the fixed height of the footer here */
-            height: 60px;
-            line-height: 60px;
+            height: 80px;
+            line-height: 30px;
             /* Vertically center the text there */
             background-color: #f5f5f5;
         }
@@ -26,28 +26,35 @@
 
 <body style="background:#f5f5f5">
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <a class="navbar-brand" href="#">
+        <a class="navbar-brand mb-1 h1" href="#">
             <!--img src="/docs/4.1/assets/brand/bootstrap-solid.svg" width="30" height="30" class="d-inline-block align-top" alt="" -->JpLearn
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup"
             aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <div class="navbar-nav">
-                <a class="nav-item nav-link" href="#">Home
-                    <span class="sr-only">(current)</span>
-                </a>
-                <a class="nav-item nav-link active" href="#">Word List</a>
-                <a class="nav-item nav-link" href="https://github.com/benkerd22/JpLearn">Github</a>
-            </div>
-            <p class="navbar-text text-right">
-                created by zzd
-            </p>
+        <div class="collapse navbar-collapse w-100" id="navbarNavAltMarkup">
+            <ul class="nav navbar-nav">
+                <li class="p-1 nav-item">
+                    <a class="nav-link" href="#">Home</a>
+                </li>
+                <li class="p-1 nav-item">
+                    <a class="nav-link active" href="#">Word List
+                        <span class="sr-only">(current)</span>
+                    </a>
+                </li>
+                <li class="p-1 nav-item">
+                    <a class="nav-link" href="https://github.com/benkerd22/JpLearn">Github</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav ml-auto">
+                <li class="p-1 nav-item align-self-end">
+                    <a class="nav-link" href="#">Log out</a>
+                </li>
+            </ul>
         </div>
     </nav>
-    <p></p>
-    <p></p>
+    <p></p><p></p>
     <audio id="pronunce">
         <source src="audio/{{ gana }}/" type="audio/mpeg"></source>
     </audio>
@@ -84,6 +91,7 @@
                     </h6>
                 </div>
             </div>
+            <p></p>
             <div class="row justify-content-between">
                 <button id="show" class="btn btn-light" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false">show</button>
                 <button id="next" class="btn btn-outline-success">next &raquo;</button>
@@ -93,8 +101,8 @@
 
     <footer class="footer">
         <div class="container">
-            <p class="text-muted text-center font-weight-light">Powered by
-                <a href="https://www.djangoproject.com/">Django</a>
+            <p class="text-muted text-center font-weight-light">
+                Powered by&nbsp;<a href="https://www.djangoproject.com/">Django</a><br/>zzd present
             </p>
         </div>
     </footer>
