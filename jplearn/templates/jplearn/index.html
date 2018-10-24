@@ -15,27 +15,32 @@
     <div class="container-fluid">
 
         <audio id="pronunce">
-            <source src="audio/{{ gachi }}/" type="audio/mpeg"></source>
+            <source src="audio/{{ gana }}/" type="audio/mpeg"></source>
         </audio>
 
         <div class="col-md-5 col-lg-3">
             <div class="container-fluid">
                 <div class="row">
                     <div class="card card-body">
-                        <div id="kanji" class="card-title collapse multi-collapse">
+                        <div id="pic" class="card-title collapse multi-collapse">
                             <div class="row no-gutters">
-                                {% for url in kanji %}
+                                {% for url in urls %}
                                 <div class="col-2">
                                     <img src="{{ url.name }}" class="img-fluid" alt="{{ url.alt }}">
                                 </div>
                                 {% endfor %}
                             </div>
                         </div>
-                        <div class="row justify-content-start">
+                        <div class="row justify-content-start align-items-center">
                             <div class="col-xs-5">
-                                <p id="gachi" class="h1 collapse multi-collapse">&nbsp;{{ gachi }}&nbsp;&nbsp;</p>
+                                <p id="gana" class="h1 collapse multi-collapse">&nbsp;{{ gana }}{{ tone }}&nbsp;</p>
                             </div>
-                            <div class="col-xs-1 align-self-center">
+                            {% if kanji != gana %}
+                            <div class="col-xs-4">
+                                <p id="kanji" class="h4 collapse multi-collapse">［{{ kanji }}］</p>
+                            </div>
+                            {% endif %}
+                            <div class="col-xs-1">
                                 <button id="play" class="btn btn-light btn-sm">▷</button>
                             </div>
                         </div>
@@ -82,11 +87,11 @@
 
         $("#show").click(function (e) {
             let kanji = document.getElementById("kanji");
-            let gachi = document.getElementById("gachi");
+            let gana = document.getElementById("gana");
             let chn = document.getElementById("chn");
 
             kanji.classList.remove("invisible");
-            gachi.classList.remove("invisible");
+            gana.classList.remove("invisible");
             chn.classList.remove("invisible");
         })
 

@@ -7,8 +7,11 @@ import os
 
 def index(request):
     choice = random.randint(0, len(dic) - 1)
-    context = {'gachi':dic[choice][0], 'chn':chn[choice]}
-    context['kanji'] = []
+
+    context = {'kanji':dic[choice][-1], 'gana':dic[choice][0], 'chn':chn[choice]}
+    context['tone'] = ''.join(tonestr[int(t)] for t in tone[choice])
+
+    context['urls'] = [] # generate urls for gif showing
 
     for x in dic[choice][-1]:
         url = ''
@@ -29,8 +32,11 @@ def index(request):
         if not gif == '':
             url = 'https://kakijun.jp/gif-h-k-al/' + gif + '.gif'
         
-        context['kanji'].append({'name':url, 'alt':x})
-        context['visible'] = mode[random.randint(0, 3)]
+        context['urls'].append({'name':url, 'alt':x})
+    
+    context['visible'] = mode[random.randint(0, 3)]
+    if context['kanji'] == context['gana'] and context['visible'] == 'kanji':
+        context['visible'] = 'gana'
 
     return render(request, 'jplearn/index.html', context)
 
@@ -44,12 +50,16 @@ def audio(request, q):
         raise Http404()
 
 with open('jplearn/dictionary/dic.txt', 'r', encoding='UTF-8') as f:
-    dic = [line.split() for line in f]
+    dic = [line.split() for line in f] # dic include 漢字、仮名
 
 with open('jplearn/dictionary/chn.txt', 'r', encoding='UTF-8') as f:
-    chn = [line for line in f]
+    chn = [line.strip() for line in f] # chn is 中文 only
+
+with open('jplearn/dictionary/tone.txt', 'r', encoding='UTF-8') as f:
+    tone = [line.strip() for line in f]
 
 hiragana = ['あ', 'い', 'う', 'え', 'お', 'か', 'き', 'く', 'け', 'こ', 'さ', 'し', 'す', 'せ', 'そ', 'た', 'ち', 'つ', 'て', 'と', 'な', 'に', 'ぬ', 'ね', 'の', 'は', 'ひ', 'ふ', 'へ', 'ほ', 'ま', 'み', 'む', 'め', 'も', 'や', '', 'ゆ', '', 'よ', 'ら', 'り', 'る', 'れ', 'ろ', 'わ', '', '', '', 'を', 'ん']
 katakana = ['ア', 'イ', 'ウ', 'エ', 'オ', 'カ', 'キ', 'ク', 'ケ', 'コ', 'サ', 'シ', 'ス', 'セ', 'ソ', 'タ', 'チ', 'ツ', 'テ', 'ト', 'ナ', 'ニ', 'ヌ', 'ネ', 'ノ', 'ハ', 'ヒ', 'フ', 'ヘ', 'ホ', 'マ', 'ミ', 'ム', 'メ', 'モ', 'ヤ', '', 'ユ', '', 'ヨ', 'ラ', 'リ', 'ル', 'レ', 'ロ', 'ワ', '', '', '', 'ヲ', 'ン']
 roman = ['a', 'i', 'u', 'e', 'o']
-mode = ['kanji', 'gachi', 'chn', 'play']
+mode = ['kanji', 'gana', 'chn', 'play'] # which HTML element should be visible
+tonestr = '⓪①②③④⑤⑥⑦⑧⑨⑩'
