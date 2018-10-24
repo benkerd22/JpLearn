@@ -1,10 +1,12 @@
 <!doctype html>
-<html lang="zh">
+<html lang="en">
 
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>JpLearn - Word list</title>
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
@@ -82,7 +84,7 @@
                         </div>
                         {% endif %}
                         <div class="col-xs-1">
-                            <button id="play" class="btn btn-light btn-sm">▷</button>
+                            <button id="play" class="btn btn-light btn-sm invisible">▷</button>
                         </div>
                     </div>
                     <h6 id="chn" class="collapse multi-collapse">
@@ -123,19 +125,37 @@
     <script>
         "use strict"
 
-        let media = document.getElementById("pronunce");
-        $("#{{ visible }}").removeClass("collapse multi-collapse");
+        let media = document.getElementsByTagName("audio")[0];
+        let auto_repeat_times = 2;
 
         $(document).ready(function () {
-            if ("{{ visible }}" == "play") {
-                media.play();
+        })
 
-                setTimeout(media.play.bind(media), 2500);
+        $("#{{ visible }}").removeClass("collapse multi-collapse");
+
+        $("#play").click(function (e) {
+            $("#play").addClass("disabled").text("♪");
+            auto_repeat_times = 1;
+            media.play();
+        })
+
+        media.addEventListener("pause", function() {
+            auto_repeat_times--;
+            if (auto_repeat_times == 0) {
+                $("#play").removeClass("disabled").text("▷");
+            } else {
+                media.play();
             }
         })
 
-        $("#play").click(function (e) {
-            media.play();
+        media.addEventListener("canplay", function() {
+            console.log("aaaa");
+            $("#play").removeClass("invisible");
+            if ("{{ visible }}" == "play") {
+                $("#play").addClass("disabled").text("♪");
+                
+                media.play();
+            }
         })
 
         $("#next").click(function (e) {
