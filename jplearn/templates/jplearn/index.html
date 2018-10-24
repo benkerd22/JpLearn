@@ -25,7 +25,7 @@
 </head>
 
 <body style="background:#f5f5f5">
-    <nav class="navbar navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <a class="navbar-brand" href="#">
             <!--img src="/docs/4.1/assets/brand/bootstrap-solid.svg" width="30" height="30" class="d-inline-block align-top" alt="" -->JpLearn
         </a>
@@ -41,65 +41,64 @@
                 <a class="nav-item nav-link active" href="#">Word List</a>
                 <a class="nav-item nav-link" href="https://github.com/benkerd22/JpLearn">Github</a>
             </div>
-            <span class="navbar-text text-right">
-                <p></p>
-                <h6>created by zzd</h6>
-            </span>
+            <p class="navbar-text text-right">
+                created by zzd
+            </p>
         </div>
     </nav>
     <p></p>
     <p></p>
-    <div class="container-fluid">
+    <audio id="pronunce">
+        <source src="audio/{{ gana }}/" type="audio/mpeg"></source>
+    </audio>
 
-        <audio id="pronunce">
-            <source src="audio/{{ gana }}/" type="audio/mpeg"></source>
-        </audio>
-
-        <div class="col-md-5 col-lg-3">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="card card-body">
-                        <div id="pic" class="card-title collapse multi-collapse">
-                            <div class="row no-gutters">
-                                {% for url in urls %}
-                                <div class="col-2">
-                                    <img src="{{ url.name }}" class="img-fluid" alt="{{ url.alt }}">
-                                </div>
-                                {% endfor %}
+    <div class="col-md-5 col-lg-3">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="card card-body">
+                    <div id="pic" class="card-title collapse multi-collapse">
+                        <div class="row no-gutters">
+                            {% for url in urls %}
+                            <div class="col-2">
+                                <img src="{{ url.name }}" class="img-fluid" alt="{{ url.alt }}">
                             </div>
+                            {% endfor %}
                         </div>
-                        <div class="row justify-content-start align-items-center">
-                            <div class="col-xs-5">
-                                <p id="gana" class="h1 collapse multi-collapse">&nbsp;{{ gana }}{{ tone }}&nbsp;</p>
-                            </div>
-                            {% if kanji != gana %}
-                            <div class="col-xs-4">
-                                <p id="kanji" class="h4 collapse multi-collapse">［{{ kanji }}］</p>
-                            </div>
-                            {% endif %}
-                            <div class="col-xs-1">
-                                <button id="play" class="btn btn-light btn-sm">▷</button>
-                            </div>
-                        </div>
-                        <h6 id="chn" class="collapse multi-collapse">
-                            <p></p>
-                            <em>{{ chn }}</em>
-                        </h6>
                     </div>
+                    <div class="row justify-content-start align-items-center">
+                        <div class="col-xs-5">
+                            <p id="gana" class="h1 collapse multi-collapse">&nbsp;{{ gana }}{{ tone }}&nbsp;</p>
+                        </div>
+                        {% if kanji != gana %}
+                        <div class="col-xs-4">
+                            <p id="kanji" class="h4 collapse multi-collapse">［{{ kanji }}］</p>
+                        </div>
+                        {% endif %}
+                        <div class="col-xs-1">
+                            <button id="play" class="btn btn-light btn-sm">▷</button>
+                        </div>
+                    </div>
+                    <h6 id="chn" class="collapse multi-collapse">
+                        <p></p>
+                        <em>{{ chn }}</em>
+                    </h6>
                 </div>
-                <div class="row justify-content-between">
-                    <button id="show" class="btn btn-light" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false">show</button>
-                    <button id="next" class="btn btn-outline-success">next &raquo;</button>
-                </div>
+            </div>
+            <div class="row justify-content-between">
+                <button id="show" class="btn btn-light" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false">show</button>
+                <button id="next" class="btn btn-outline-success">next &raquo;</button>
             </div>
         </div>
-
-        <footer class="footer">
-            <div class="container">
-                <p class="text-muted text-center font-weight-light">Powered by <a href="https://www.djangoproject.com/">Django</a></p>
-            </div>
-        </footer>
     </div>
+
+    <footer class="footer">
+        <div class="container">
+            <p class="text-muted text-center font-weight-light">Powered by
+                <a href="https://www.djangoproject.com/">Django</a>
+            </p>
+        </div>
+    </footer>
+
 
     <!-- Optional JavaScript -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"></script>
