@@ -63,7 +63,7 @@
         </source>
     </audio>
 
-    <div class="col-md-5 col-lg-3">
+    <div class="col-md-5 col-xl-3">
         <div class="container-fluid">
             <div class="row">
                 <div class="card card-body">
@@ -102,23 +102,31 @@
                 <button id="next" class="btn btn-outline-success">next &raquo;</button>
             </div>
         </div>
-        <br /><br />
+        <br />
         <div class="row align-items-end">
             <div class="col flex-grow-1"></div>
+            <div class="col-2 mb-1" data-toggle="collapse" data-target="#modeSettings">
+                <img src="https://cdn4.iconfinder.com/data/icons/forgen-phone-settings/48/setting-512.png" alt="Settings"
+                    class="rounded float-right" style="height: 16px; filter: opacity(20%);">
+            </div>
+            <div class="w-100"></div>
+            <div class="col flex-grow-1"></div>
             <div class="col-xl-8">
-                <div class="card card-body">
-                    <div class="row">
-                        <div class="col-3">
-                            <button class="btn btn-light" id="kanjiCheck">漢字</button>
-                        </div>
-                        <div class="col-3">
-                            <button class="btn btn-light" id="ganaCheck">仮名</button>
-                        </div>
-                        <div class="col-3">
-                            <button class="btn btn-light" id="chnCheck">CHN</button>
-                        </div>
-                        <div class="col-3">
-                            <button class="btn btn-light" id="playCheck">♪</button>
+                <div id="modeSettings" class="collapse">
+                    <div class="card card-body">
+                        <div class="row">
+                            <div class="col-3">
+                                <button class="btn btn-light" id="kanjiCheck">漢字</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn btn-light" id="ganaCheck">仮名</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn btn-light" id="chnCheck">CHN</button>
+                            </div>
+                            <div class="col-3">
+                                <button class="btn btn-light" id="playCheck">♪</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -158,7 +166,8 @@
         let mode = defaultMode;
         let visible = "";
         let elemList = ["kanji", "gana", "chn", "play"];
-    
+        let settingState = "0"; // 0: hidden(default)  1: shown
+
         elemList.forEach(function (id) {
             let elem = document.getElementById(id + "Check");
             let onclick = function (e) {
@@ -197,6 +206,16 @@
                 visible = "gana";
             }
             $("#" + visible).removeClass("collapse multi-collapse");
+
+
+            if (!localStorage.getItem("settingState"))
+                localStorage.setItem("settingState", "0");
+            else
+                settingState = localStorage.getItem("settingState");
+            
+            if (settingState == "1") {
+                $("#modeSettings").collapse('show');
+            }
         })
 
         $("#play").click(function (e) {
@@ -246,7 +265,17 @@
 
             localStorage.setItem("mode", newmode);
 
+            localStorage.setItem("settingState", settingState);
+
             location.reload();
+        })
+
+        $("#modeSettings").on("shown.bs.collapse", function () {
+            settingState = "1";
+        })
+
+        $("#modeSettings").on("hidden.bs.collapse", function () {
+            settingState = "0";
         })
     </script>
 </body>
