@@ -33,19 +33,6 @@ def index(request):
             url = 'https://kakijun.jp/gif-h-k-al/' + gif + '.gif'
         
         context['urls'].append({'name':url, 'alt':x})
-    
-    try:
-        prefer = int(request.GET.get('m', ''))
-    except:
-        prefer = -1
-
-    if prefer in range(0, 4):
-        context['visible'] = mode[prefer]
-    else:
-        context['visible'] = mode[random.randint(0, 3)]
-
-    if context['kanji'] == context['gana'] and context['visible'] == 'kanji':
-        context['visible'] = 'gana'
 
     return render(request, 'jplearn/index.html', context)
 

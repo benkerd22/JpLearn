@@ -31,8 +31,8 @@
         <a class="navbar-brand mb-1 h1" href="#">
             <!--img src="/docs/4.1/assets/brand/bootstrap-solid.svg" width="30" height="30" class="d-inline-block align-top" alt="" -->JpLearn
         </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup"
-            aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+            aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse w-100" id="navbarNavAltMarkup">
@@ -56,9 +56,11 @@
             </ul>
         </div>
     </nav>
-    <p></p><p></p>
+    <p></p>
+    <p></p>
     <audio id="pronunce">
-        <source src="audio/{{ gana }}/" type="audio/mpeg"></source>
+        <source src="audio/{{ gana }}/" type="audio/mpeg">
+        </source>
     </audio>
 
     <div class="col-md-5 col-lg-3">
@@ -76,15 +78,15 @@
                     </div>
                     <div class="row justify-content-start align-items-center">
                         <div class="col-xs-5">
-                            <p id="gana" class="h1 collapse multi-collapse">&nbsp;{{ gana }}{{ tone }}&nbsp;</p>
+                            <p id="gana" class="h1 collapse multi-collapse">&nbsp;{{ gana }}{{ tone }}&nbsp;&nbsp;</p>
                         </div>
                         {% if kanji != gana %}
                         <div class="col-xs-4">
-                            <p id="kanji" class="h4 collapse multi-collapse">［{{ kanji }}］</p>
+                            <p id="kanji" class="h4 collapse multi-collapse">&nbsp;{{ kanji }}&nbsp;</p>
                         </div>
                         {% endif %}
-                        <div class="col-xs-1">
-                            <button id="play" class="btn btn-light btn-sm invisible">▷</button>
+                        <div class="col-xs-1 pl-2">
+                            <button id="play" class="btn btn-light btn-sm collapse multi-collapse">▷</button>
                         </div>
                     </div>
                     <h6 id="chn" class="collapse multi-collapse">
@@ -95,16 +97,40 @@
             </div>
             <p></p>
             <div class="row justify-content-between">
-                <button id="show" class="btn btn-light" type="button" data-toggle="collapse" data-target=".multi-collapse" aria-expanded="false">show</button>
+                <button id="show" class="btn btn-outline-light" type="button" data-toggle="collapse" data-target=".multi-collapse"
+                    aria-expanded="false">⌄</button>
                 <button id="next" class="btn btn-outline-success">next &raquo;</button>
             </div>
         </div>
+        <br /><br />
+        <div class="row align-items-end">
+            <div class="col flex-grow-1"></div>
+            <div class="col-xl-8">
+                <div class="card card-body">
+                    <div class="row">
+                        <div class="col-3">
+                            <button class="btn btn-light" id="kanjiCheck">漢字</button>
+                        </div>
+                        <div class="col-3">
+                            <button class="btn btn-light" id="ganaCheck">仮名</button>
+                        </div>
+                        <div class="col-3">
+                            <button class="btn btn-light" id="chnCheck">CHN</button>
+                        </div>
+                        <div class="col-3">
+                            <button class="btn btn-light" id="playCheck">♪</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     </div>
 
     <footer class="footer">
         <div class="container">
             <p class="text-muted text-center font-weight-light">
-                Powered by&nbsp;<a href="https://www.djangoproject.com/">Django</a><br/>zzd present
+                Powered by&nbsp;<a href="https://www.djangoproject.com/">Django</a><br />zzd present
             </p>
         </div>
     </footer>
@@ -124,41 +150,102 @@
 
     <script>
         "use strict"
+        "⌄⌃⩓⩔"
 
         let media = document.getElementsByTagName("audio")[0];
-        let auto_repeat_times = 2;
-
-        $(document).ready(function () {
+        let autoRepeatTimes = 2;
+        let defaultMode = "0001";
+        let mode = defaultMode;
+        let visible = "";
+        let elemList = ["kanji", "gana", "chn", "play"];
+    
+        elemList.forEach(function (id) {
+            let elem = document.getElementById(id + "Check");
+            let onclick = function (e) {
+                if (this.classList.contains("btn-light")) {
+                    this.classList.remove("btn-light");
+                    this.classList.add("btn-primary");
+                } else {
+                    this.classList.remove("btn-primary");
+                    this.classList.add("btn-light");
+                }
+            }
+            elem.addEventListener("click", onclick.bind(elem));
         })
 
-        $("#{{ visible }}").removeClass("collapse multi-collapse");
+        $(document).ready(function () {
+            if (!localStorage.getItem("mode"))
+                localStorage.setItem("mode", defaultMode);
+            else
+                mode = localStorage.getItem("mode")
+
+            let l = [];
+            for (let i = 0; i < mode.length; i++) {
+                let elem = document.getElementById(elemList[i] + "Check");
+                if (mode[i] == "1") {
+                    elem.classList.remove("btn-light");
+                    elem.classList.add("btn-primary");
+                    l.push(elemList[i]);
+                }
+            }
+
+            if (!l.length)
+                return;
+
+            visible = l[Math.floor(Math.random() * l.length)];
+            if ("{{ kanji }}" == "{{ gana }}" && visible == "kanji") {
+                visible = "gana";
+            }
+            $("#" + visible).removeClass("collapse multi-collapse");
+        })
 
         $("#play").click(function (e) {
             $("#play").addClass("disabled").text("♪");
-            auto_repeat_times = 1;
+            autoRepeatTimes = 1;
             media.play();
         })
 
-        media.addEventListener("pause", function() {
-            auto_repeat_times--;
-            if (auto_repeat_times == 0) {
+        media.addEventListener("pause", function () {
+            autoRepeatTimes--;
+            if (autoRepeatTimes == 0) {
                 $("#play").removeClass("disabled").text("▷");
             } else {
                 media.play();
             }
         })
 
-        media.addEventListener("canplay", function() {
-            console.log("aaaa");
+        media.addEventListener("canplay", function () {
+            console.log("media is ready");
             $("#play").removeClass("invisible");
-            if ("{{ visible }}" == "play") {
+            if (visible == "play") {
                 $("#play").addClass("disabled").text("♪");
-                
+
                 media.play();
             }
         })
 
+        $("#show").click(function (e) {
+            let show = document.getElementById("show");
+            if (show.textContent == "⌄")
+                show.textContent = "⌃";
+            else
+                show.textContent = "⌄";
+        })
+
         $("#next").click(function (e) {
+            let newmode = "";
+            for (let i = 0; i < mode.length; i++) {
+                let elem = document.getElementById(elemList[i] + "Check");
+                if (elem.classList.contains("btn-primary"))
+                    newmode += "1";
+                else
+                    newmode += "0";
+            }
+            if (newmode == "0000")
+                newmode = defaultMode;
+
+            localStorage.setItem("mode", newmode);
+
             location.reload();
         })
     </script>
