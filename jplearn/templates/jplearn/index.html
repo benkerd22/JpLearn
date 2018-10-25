@@ -9,53 +9,52 @@
     <title>JpLearn - Word list</title>
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-        crossorigin="anonymous">
+    <link id="minCSS" rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
     <style>
-        .footer {
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            /* Set the fixed height of the footer here */
-            height: 80px;
-            line-height: 30px;
-            /* Vertically center the text there */
-            background-color: #f5f5f5;
+        .settingBtn {
+            height: 16px;
+            filter: opacity(20%);
         }
     </style>
 </head>
 
-<body style="background:#f5f5f5">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <a class="navbar-brand mb-1 h1" href="#">
-            <!--img src="/docs/4.1/assets/brand/bootstrap-solid.svg" width="30" height="30" class="d-inline-block align-top" alt="" -->JpLearn
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
-            aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse w-100" id="navbarNavAltMarkup">
-            <ul class="nav navbar-nav">
-                <li class="p-1 nav-item">
-                    <a class="nav-link" href="#">Home</a>
-                </li>
-                <li class="p-1 nav-item">
-                    <a class="nav-link active" href="#">Word List
-                        <span class="sr-only">(current)</span>
-                    </a>
-                </li>
-                <li class="p-1 nav-item">
-                    <a class="nav-link" href="https://github.com/benkerd22/JpLearn">Github</a>
-                </li>
-            </ul>
-            <ul class="nav navbar-nav ml-auto">
-                <li class="p-1 nav-item align-self-end">
-                    <a class="nav-link" href="#">Log out</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
+<body>
+    <div class="sticky-top">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <a class="navbar-brand mb-1 h1" href="#">
+                <!--img src="/docs/4.1/assets/brand/bootstrap-solid.svg" width="30" height="30" class="d-inline-block align-top" alt="" -->JpLearn
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse w-100" id="navbarNavAltMarkup">
+                <ul class="nav navbar-nav">
+                    <li class="p-1 nav-item">
+                        <a class="nav-link" href="#">Home</a>
+                    </li>
+                    <li class="p-1 nav-item">
+                        <a class="nav-link active" href="#">Word List
+                            <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li class="p-1 nav-item">
+                        <a id="toggleLightDark" class="nav-link" href="#">Dark</a>
+                    </li>
+                    <li class="p-1 nav-item">
+                        <a class="nav-link" href="https://github.com/benkerd22/JpLearn">Github</a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav ml-auto">
+                    <li class="p-1 nav-item align-self-end">
+                        <a class="nav-link" href="#">Log out</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
     <p></p>
     <p></p>
     <audio id="pronunce">
@@ -63,86 +62,97 @@
         </source>
     </audio>
 
-    <div class="col-md-5 col-xl-3">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="card card-body">
-                    <div id="pic" class="card-title collapse multi-collapse">
-                        <div class="row no-gutters">
-                            {% for url in urls %}
-                            <div class="col-2">
-                                <img src="{{ url.name }}" class="img-fluid" alt="{{ url.alt }}">
-                            </div>
-                            {% endfor %}
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-md-5 col-xl-3">
+                <div class="container-fluid pb-3">
+                    <span class="card card-body">
+                        <div class="display-4">
+                            {{ gana }}
                         </div>
-                    </div>
-                    <div class="row justify-content-start align-items-center">
-                        <div class="col-xs-5">
-                            <p id="gana" class="h1 collapse multi-collapse">&nbsp;{{ gana }}{{ tone }}&nbsp;&nbsp;</p>
-                        </div>
-                        {% if kanji != gana %}
-                        <div class="col-xs-4">
-                            <p id="kanji" class="h4 collapse multi-collapse">&nbsp;{{ kanji }}&nbsp;</p>
-                        </div>
-                        {% endif %}
-                        <div class="col-xs-1 pl-2">
-                            <button id="play" class="btn btn-light btn-sm collapse multi-collapse">▷</button>
-                        </div>
-                    </div>
-                    <h6 id="chn" class="collapse multi-collapse">
-                        <p></p>
-                        <em>{{ chn }}</em>
-                    </h6>
+                    </span>
                 </div>
-            </div>
-            <p></p>
-            <div class="row justify-content-between">
-                <button id="show" class="btn btn-outline-light" type="button" data-toggle="collapse" data-target=".multi-collapse"
-                    aria-expanded="false">⌄</button>
-                <button id="next" class="btn btn-outline-success">next &raquo;</button>
-            </div>
-        </div>
-        <br />
-        <div class="row align-items-end">
-            <div class="col flex-grow-1"></div>
-            <div class="col-2 mb-1" data-toggle="collapse" data-target="#modeSettings">
-                <img src="https://cdn4.iconfinder.com/data/icons/forgen-phone-settings/48/setting-512.png" alt="Settings"
-                    class="rounded float-right" style="height: 16px; filter: opacity(20%);">
-            </div>
-            <div class="w-100"></div>
-            <div class="col flex-grow-1"></div>
-            <div class="col-xl-8">
-                <div id="modeSettings" class="collapse">
-                    <div class="card card-body">
-                        <div class="row">
-                            <div class="col-3">
-                                <button class="btn btn-light" id="kanjiCheck">漢字</button>
+
+                <div class="container-fluid m-0 pb-3">
+                    <div id="detail" class="collapse">
+                        <div class="card card-body">
+                            <div id="pic" class="card-title">
+                                <div class="row no-gutters">
+                                    {% for url in urls %}
+                                    <div class="col-2">
+                                        <img src="{{ url.name }}" class="img-fluid" alt="{{ url.alt }}">
+                                    </div>
+                                    {% endfor %}
+                                </div>
                             </div>
-                            <div class="col-3">
-                                <button class="btn btn-light" id="ganaCheck">仮名</button>
+                            <div class="row justify-content-start align-items-center">
+                                <div class="col-xs-5">
+                                    <p id="gana" class="h2">&nbsp;{{ gana }}{{ tone }}&nbsp;&nbsp;</p>
+                                </div>
+                                {% if kanji != gana %}
+                                <div class="col-xs-4">
+                                    <p id="kanji" class="h2">&nbsp;{{ kanji }}&nbsp;</p>
+                                </div>
+                                {% endif %}
+                                <div class="col-xs-1 pl-2">
+                                    <button id="play" class="btn btn-light btn-sm disabled invisible">▷</button>
+                                </div>
                             </div>
-                            <div class="col-3">
-                                <button class="btn btn-light" id="chnCheck">CHN</button>
-                            </div>
-                            <div class="col-3">
-                                <button class="btn btn-light" id="playCheck">♪</button>
-                            </div>
+                            <h6 id="chn" class="h6">
+                                <p></p>
+                                <em>{{ chn }}</em>
+                            </h6>
                         </div>
                     </div>
                 </div>
+
+                <div class="container-fluid pb-3">
+                    <div class="row justify-content-between">
+                        <div class="col">
+                            <button id="show" class="btn btn-sm btn-outline-light" type="button" data-toggle="collapse"
+                                data-target="#detail" aria-expanded="false">⌄</button>
+                        </div>
+                        <div class="col">
+                            <button id="next" class="btn btn-sm btn-outline-success float-right">next &raquo;</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container-fluid pb-2">
+                    <img id="settingBtn" src="https://cdn4.iconfinder.com/data/icons/forgen-phone-settings/48/setting-512.png"
+                        alt="Settings" class="rounded float-right settingBtn" data-toggle="collapse" data-target="#modeSettings">
+                </div>
+
+                <div class="container pb-2 mt-3">
+                    <div id="modeSettings" class="contianer collapse">
+                        <div class="card card-body">
+                            <div class="row">
+                                <div class="col-3 text-center">
+                                    <button class="btn btn-light" id="kanjiCheck">漢字</button>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <button class="btn btn-light" id="ganaCheck">仮名</button>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <button class="btn btn-light" id="chnCheck">CHN</button>
+                                </div>
+                                <div class="col-3 text-center">
+                                    <button class="btn btn-light" id="playCheck">♪</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
     </div>
 
-    <footer class="footer">
-        <div class="container">
+    <div class="container-fluid fixed-bottom">
+        <small>
             <p class="text-muted text-center font-weight-light">
                 Powered by&nbsp;<a href="https://www.djangoproject.com/">Django</a><br />zzd present
-            </p>
-        </div>
-    </footer>
-
+        </small></p>
+    </div>
 
     <!-- Optional JavaScript -->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"></script>
@@ -212,13 +222,16 @@
                 localStorage.setItem("settingState", "0");
             else
                 settingState = localStorage.getItem("settingState");
-            
+
             if (settingState == "1") {
                 $("#modeSettings").collapse('show');
             }
         })
 
         $("#play").click(function (e) {
+            if ($("#play").hasClass("disabled"))
+                return;
+
             $("#play").addClass("disabled").text("♪");
             autoRepeatTimes = 1;
             media.play();
@@ -235,7 +248,8 @@
 
         media.addEventListener("canplay", function () {
             console.log("media is ready");
-            $("#play").removeClass("invisible");
+
+            $("#play").removeClass("disabled invisible");
             if (visible == "play") {
                 $("#play").addClass("disabled").text("♪");
 
@@ -276,6 +290,27 @@
 
         $("#modeSettings").on("hidden.bs.collapse", function () {
             settingState = "0";
+        })
+
+        $("#toggleLightDark").click(function (e) {
+            let elem = document.getElementById("toggleLightDark");
+            if (elem.textContent == "Dark") {
+                elem.textContent = "Light";
+                $("#body").css("background-color", "");
+                //$("#footer").css("background-color", "");
+                $("#minCSS").attr("href", "https://bootswatch.com/4/darkly/bootstrap.min.css")
+                    .attr("integrity", "")
+                    .attr("crossorigin", "");
+                $("#settingBtn").css("filter", "invert(0%)");
+            } else {
+                elem.textContent = "Dark";
+                $("#body").css("background-color", "#f5f5f5");
+                //$("#footer").css("background-color", "#f5f5f5");
+                $("#minCSS").attr("href", "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css")
+                    .attr("integrity", "sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm")
+                    .attr("crossorigin", "anonymous");
+                $("#settingBtn").css("filter", "invert(50%)");
+            }
         })
     </script>
 </body>
