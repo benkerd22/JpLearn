@@ -17,6 +17,11 @@
             height: 16px;
             filter: opacity(20%);
         }
+
+        @font-face {
+            font-family: "MYTTF";
+            src: url("ttf");
+        }
     </style>
 </head>
 
@@ -36,7 +41,7 @@
                         <a class="nav-link" href="#">Home</a>
                     </li>
                     <li class="p-1 nav-item">
-                        <a class="nav-link active" href="#">Word List
+                        <a class="nav-link active" href="#">Test
                             <span class="sr-only">(current)</span>
                         </a>
                     </li>
@@ -55,20 +60,23 @@
             </div>
         </nav>
     </div>
-    <p></p>
-    <p></p>
-    <audio id="pronunce">
-        <source src="audio/{{ gana }}/" type="audio/mpeg">
-        </source>
-    </audio>
 
-    <div class="container-fluid">
+    <audio id="pronunce" src=""></audio>
+
+    <div class="container-fluid pt-3">
         <div class="row justify-content-center">
             <div class="col-md-5 col-xl-3">
-                <div class="container-fluid pb-3">
+                <div class="container-fluid pb-3" style="height: 114px">
                     <span class="card card-body">
-                        <div class="display-4">
-                            {{ gana }}
+                        <div class="row">
+                            <div class="col-auto pr-2">
+                                <div id="realDisplay" class="" style="font-family: MYTTF">
+                                    <!-- To be displayed -->
+                                </div>
+                            </div>
+                            <div class="row align-items-center justify-content-center">
+                                <div class="col"><button id="play" class="btn btn-light btn-sm disabled">▷</button></div>
+                            </div>
                         </div>
                     </span>
                 </div>
@@ -76,32 +84,26 @@
                 <div class="container-fluid m-0 pb-3">
                     <div id="detail" class="collapse">
                         <div class="card card-body">
-                            <div id="pic" class="card-title">
-                                <div class="row no-gutters">
-                                    {% for url in urls %}
-                                    <div class="col-2">
-                                        <img src="{{ url.name }}" class="img-fluid" alt="{{ url.alt }}">
+                            <div class="container-fluid pb-3">
+                                <div id="gifrow" class="row no-gutters">
+                                    <!-- Gif show here -->
+                                </div>
+                            </div>
+                            <div class="container-fluid pb-3">
+                                <div class="row">
+                                    <div class="col-auto">
+                                        <p id="gana" class="h3 font-weight-light"></p>
                                     </div>
-                                    {% endfor %}
+                                    <div class="w-100"></div>
+                                    <div class="col-auto">
+                                        <p id="kanji" class="h3 font-weight-light"></p>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="row justify-content-start align-items-center">
-                                <div class="col-xs-5">
-                                    <p id="gana" class="h2">&nbsp;{{ gana }}{{ tone }}&nbsp;&nbsp;</p>
-                                </div>
-                                {% if kanji != gana %}
-                                <div class="col-xs-4">
-                                    <p id="kanji" class="h2">&nbsp;{{ kanji }}&nbsp;</p>
-                                </div>
-                                {% endif %}
-                                <div class="col-xs-1 pl-2">
-                                    <button id="play" class="btn btn-light btn-sm disabled invisible">▷</button>
+                            <div class="container-fluid">
+                                <div id="chn" class="h6 text-muted font-weight-light">
                                 </div>
                             </div>
-                            <h6 id="chn" class="h6">
-                                <p></p>
-                                <em>{{ chn }}</em>
-                            </h6>
                         </div>
                     </div>
                 </div>
@@ -123,21 +125,26 @@
                         alt="Settings" class="rounded float-right settingBtn" data-toggle="collapse" data-target="#modeSettings">
                 </div>
 
-                <div class="container pb-2 mt-3">
-                    <div id="modeSettings" class="contianer collapse">
-                        <div class="card card-body">
-                            <div class="row">
-                                <div class="col-3 text-center">
-                                    <button class="btn btn-light" id="kanjiCheck">漢字</button>
-                                </div>
-                                <div class="col-3 text-center">
-                                    <button class="btn btn-light" id="ganaCheck">仮名</button>
-                                </div>
-                                <div class="col-3 text-center">
-                                    <button class="btn btn-light" id="chnCheck">CHN</button>
-                                </div>
-                                <div class="col-3 text-center">
-                                    <button class="btn btn-light" id="playCheck">♪</button>
+                <div class="container-fluid pb-2 mt-3">
+                    <div id="modeSettings" class="collapse">
+                        <div class="row justify-content-end">
+                            <div class="col"></div>
+                            <div class="col-sm-auto">
+                                <div class="card card-body">
+                                    <div class="row justify-content-center">
+                                        <div class="col-auto text-center">
+                                            <button class="btn btn-sm btn-light" data-target="1" id="kanjiCheck">漢字</button>
+                                        </div>
+                                        <div class="col-auto text-center">
+                                            <button class="btn btn-sm btn-light" data-target="2">仮名</button>
+                                        </div>
+                                        <div class="col-auto text-center">
+                                            <button class="btn btn-sm btn-light" data-target="3">CHN</button>
+                                        </div>
+                                        <div class="col-auto text-center">
+                                            <button class="btn btn-sm btn-light" data-target="4">♪</button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -150,7 +157,7 @@
     <div class="container-fluid fixed-bottom">
         <small>
             <p class="text-muted text-center font-weight-light">
-                Powered by&nbsp;<a href="https://www.djangoproject.com/">Django</a><br />zzd present
+                zzd present
         </small></p>
     </div>
 
@@ -168,144 +175,180 @@
 
     <script>
         "use strict"
-        "⌄⌃⩓⩔"
 
-        let media = document.getElementsByTagName("audio")[0];
-        let autoRepeatTimes = 2;
-        let defaultMode = "0001";
-        let mode = defaultMode;
-        let visible = "";
-        let elemList = ["kanji", "gana", "chn", "play"];
-        let settingState = "0"; // 0: hidden(default)  1: shown
-
-        elemList.forEach(function (id) {
-            let elem = document.getElementById(id + "Check");
+        $("#modeSettings").find("button").each(function () {
             let onclick = function (e) {
-                if (this.classList.contains("btn-light")) {
-                    this.classList.remove("btn-light");
-                    this.classList.add("btn-primary");
+                if (this.hasClass("btn-light")) {
+                    this.removeClass("btn-light");
+                    this.addClass("btn-primary");
                 } else {
-                    this.classList.remove("btn-primary");
-                    this.classList.add("btn-light");
+                    this.removeClass("btn-primary");
+                    this.addClass("btn-light");
                 }
             }
-            elem.addEventListener("click", onclick.bind(elem));
+            $(this).click(onclick.bind($(this)));
         })
 
-        $(document).ready(function () {
-            if (!localStorage.getItem("mode"))
-                localStorage.setItem("mode", defaultMode);
-            else
-                mode = localStorage.getItem("mode")
-
-            let l = [];
-            for (let i = 0; i < mode.length; i++) {
-                let elem = document.getElementById(elemList[i] + "Check");
-                if (mode[i] == "1") {
-                    elem.classList.remove("btn-light");
-                    elem.classList.add("btn-primary");
-                    l.push(elemList[i]);
-                }
-            }
-
-            if (!l.length)
-                return;
-
-            visible = l[Math.floor(Math.random() * l.length)];
-            if ("{{ kanji }}" == "{{ gana }}" && visible == "kanji") {
-                visible = "gana";
-            }
-            $("#" + visible).removeClass("collapse multi-collapse");
-
-
-            if (!localStorage.getItem("settingState"))
-                localStorage.setItem("settingState", "0");
-            else
-                settingState = localStorage.getItem("settingState");
-
-            if (settingState == "1") {
-                $("#modeSettings").collapse('show');
-            }
-        })
-
+        let media = $("audio")[0];
+        let autoRepeatTimes = 2;
+        
         $("#play").click(function (e) {
             if ($("#play").hasClass("disabled"))
                 return;
 
             $("#play").addClass("disabled").text("♪");
             autoRepeatTimes = 1;
-            media.play();
+            $(media).trigger("play");
         })
 
-        media.addEventListener("pause", function () {
-            autoRepeatTimes--;
-            if (autoRepeatTimes == 0) {
-                $("#play").removeClass("disabled").text("▷");
-            } else {
-                media.play();
-            }
+        $(media)
+            .on("pause", function () {
+                if (autoRepeatTimes == 0)
+                    return;
+
+                autoRepeatTimes--;
+                if (autoRepeatTimes == 0) {
+                    $("#play").removeClass("disabled").text("▷");
+                } else {
+                    $(media).trigger("play");
+                }
+            })
+            .on("loadstart", function() {
+                $("#play").addClass("disabled invisible");
+            })
+            .on("canplaythrough", function () {
+                $("#play").removeClass("disabled invisible");
+                if (autoRepeatTimes > 0) {
+                    $("#play").addClass("disabled").text("♪");
+
+                    $(media).trigger("play");
+                }
+            })
+
+        let getnext = function () {
+            $.getJSON("next")
+                .done(function (json) {
+                    let refreshDisplay = function () {
+                        let randomArr = [];
+                        $("#modeSettings").find("button").each(function() {
+                            if ($(this).hasClass("btn-primary")) {
+                                randomArr.push(parseInt($(this).data("target")));
+                            }
+                        })
+
+                        $("#realDisplay").text("");
+
+                        let rand = randomArr[Math.floor(Math.random() * randomArr.length)];
+                        if (typeof(rand) == "undefined") {
+                            $("#kanjiCheck").click();
+                            rand = 1;
+                        }
+
+                        autoRepeatTimes = rand === 4 ? 2 : 0;
+                        autoRepeatTimes = 0;
+                        if (rand === 4) {
+                            autoRepeatTimes = 2;
+                            $("#pronunce").trigger("load");
+                            return;
+                        }
+                        $("#pronunce").trigger("load");
+
+                        if (rand === 3) {
+                            $("#realDisplay")
+                                .text(json.chn)
+                                .css("font-family", "")
+                                .removeClass("h2")
+                                .addClass("h1 lead");
+                            return;
+                        }
+
+                        if (rand === 1 && json.kanji !== json.gana) {
+                            $("#realDisplay")
+                                .text(json.kanji)
+                                .css("font-family", "MYTTF")
+                                .removeClass("h2 lead")
+                                .addClass("h1");
+                            return;
+                        }
+
+                        $("#realDisplay")
+                            .empty()
+                            .append(`${json.gana}<small>&nbsp;${json.tone}</small>`)
+                            .css("font-family", "MYTTF")
+                            .removeClass("lead h1 h2")
+                            .addClass(json.gana.length >= 6 ? "h2" : "h1");
+                    }
+
+                    let refreshDetail = function () {
+                        $("#pronunce").attr("src", `audio/${json.gana}`);
+
+                        $("#play")
+                            .text("▷")
+                            .addClass("disabled invisible");
+
+                        $("#gifrow").empty();
+                        json.urls.forEach(url => {
+                            $("#gifrow").append(
+                                `<div class="col-2">
+                                        <img src="${url.name}" class="img-fluid" alt="${url.alt}">
+                                    </div>`);
+                        })
+
+                        $("#gana").empty().append(`${json.gana}&nbsp;${json.tone}`);
+
+                        $("#kanji").text("");
+                        if (json.gana != json.kanji) {
+                            $("#kanji").text(json.kanji);
+                        }
+
+                        $("#chn").text(json.chn);
+
+                        refreshDisplay();
+
+                        $("#detail").off();
+                    }
+                    
+                    if ($("#detail").hasClass("show")) {
+                        $("#detail")
+                            .collapse("hide")
+                            .on("hidden.bs.collapse", refreshDetail)
+                    } else
+                        refreshDetail();
+                })
+                .fail(function (jqXHR, textStatus, err) {
+                    console.log(err);
+                });
+        }
+
+        $(document).ready(function () {
+            getnext();
         })
 
-        media.addEventListener("canplay", function () {
-            console.log("media is ready");
-
-            $("#play").removeClass("disabled invisible");
-            if (visible == "play") {
-                $("#play").addClass("disabled").text("♪");
-
-                media.play();
-            }
-        })
+        //(function () {
+            
+        //})();
 
         $("#show").click(function (e) {
-            let show = document.getElementById("show");
-            if (show.textContent == "⌄")
-                show.textContent = "⌃";
-            else
-                show.textContent = "⌄";
+            let t = document.getElementById("show").textContent;
+            $("#show").text(t == "⌄" ? "⌃" : "⌄");
         })
 
         $("#next").click(function (e) {
-            let newmode = "";
-            for (let i = 0; i < mode.length; i++) {
-                let elem = document.getElementById(elemList[i] + "Check");
-                if (elem.classList.contains("btn-primary"))
-                    newmode += "1";
-                else
-                    newmode += "0";
-            }
-            if (newmode == "0000")
-                newmode = defaultMode;
-
-            localStorage.setItem("mode", newmode);
-
-            localStorage.setItem("settingState", settingState);
-
-            location.reload();
-        })
-
-        $("#modeSettings").on("shown.bs.collapse", function () {
-            settingState = "1";
-        })
-
-        $("#modeSettings").on("hidden.bs.collapse", function () {
-            settingState = "0";
+            getnext();
         })
 
         $("#toggleLightDark").click(function (e) {
-            let elem = document.getElementById("toggleLightDark");
-            if (elem.textContent == "Dark") {
-                elem.textContent = "Light";
+            let elem = $("#toggleLightDark");
+            if (elem.text() === "Dark") {
+                elem.text("Light");
                 $("#body").css("background-color", "");
-                //$("#footer").css("background-color", "");
                 $("#minCSS").attr("href", "https://bootswatch.com/4/darkly/bootstrap.min.css")
                     .attr("integrity", "")
                     .attr("crossorigin", "");
                 $("#settingBtn").css("filter", "invert(0%)");
             } else {
-                elem.textContent = "Dark";
+                elem.text("Dark");
                 $("#body").css("background-color", "#f5f5f5");
-                //$("#footer").css("background-color", "#f5f5f5");
                 $("#minCSS").attr("href", "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css")
                     .attr("integrity", "sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm")
                     .attr("crossorigin", "anonymous");
