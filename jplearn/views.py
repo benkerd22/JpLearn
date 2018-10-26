@@ -28,7 +28,7 @@ def audio(request, q):
     raise Http404()
 
 def ttf(request):
-    return FileResponse(open('E:\\1.ttf', 'rb'))
+    return FileResponse(open('jplearn/font/my.ttf', 'rb'))
 
 def test(request):
     return render(request, 'jplearn/index.html', getNextContext())
