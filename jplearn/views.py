@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse, Http404, FileResponse, JsonResponse
+from django.contrib.auth.decorators import login_required
 import random
 import urllib
 
@@ -20,6 +21,7 @@ roman = ['a', 'i', 'u', 'e', 'o']
 mode = ['kanji', 'gana', 'chn', 'play'] # which HTML element should be visible
 tonestr = '⓪①②③④⑤⑥⑦⑧⑨⑩'
 
+@login_required(login_url='login')
 def audio(request, q):
     fname = urllib.parse.unquote(q)
     fname = 'jplearn/audio/' + fname + '.mp3'
@@ -27,9 +29,11 @@ def audio(request, q):
         return FileResponse(open(fname, 'rb'))
     raise Http404()
 
+@login_required(login_url='login')
 def ttf(request):
     return FileResponse(open('jplearn/font/my.ttf', 'rb'))
 
+@login_required(login_url='login')
 def test(request):
     return render(request, 'jplearn/index.html', getNextContext())
 
@@ -64,8 +68,10 @@ def getNextContext():
 
     return context
 
+@login_required(login_url='login')
 def next(request):
     return JsonResponse(getNextContext())
 
-
+def welcome(request):
+    return render(request, "jplearn/welcome.html")
 
