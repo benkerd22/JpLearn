@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="A site for learning Japanese Words">
+    <meta name="author" content="zzd">
+
+    <title>JpLearn - Word list</title>
+
+    <!-- Bootstrap CSS -->
+    <link id="minCSS" rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <style>
+        @font-face {
+            font-family: "MYTTF";
+            src: url("{% url 'jplearn:ttf' %}");
+        }
+    </style>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/jq-3.3.1/dt-1.10.18/r-2.2.2/datatables.min.css" />
+</head>
+
+<body>
+    <div class="sticky-top">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <a class="navbar-brand mb-1 h1" href="#">
+                <!--img src="/docs/4.1/assets/brand/bootstrap-solid.svg" width="30" height="30" class="d-inline-block align-top" alt="" -->JpLearn
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse w-100" id="navbarNavAltMarkup">
+                <ul class="nav navbar-nav">
+                    <li class="p-1 nav-item">
+                        <a class="nav-link" href="#">Home</a>
+                    </li>
+                    <li class="p-1 nav-item">
+                        <a class="nav-link" href="{% url 'jplearn:test' %}">Test
+                        </a>
+                    </li>
+                    <li class="p-1 nav-item">
+                        <a class="nav-link active" href="#">Dictionary
+                            <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li class="p-1 nav-item">
+                        <a id="toggleLightDark" class="nav-link" href="#">Dark</a>
+                    </li>
+                    <li class="p-1 nav-item">
+                        <a class="nav-link" href="https://github.com/benkerd22/JpLearn">Github</a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav ml-auto">
+                    <li class="p-1 nav-item align-self-end">
+                        <a class="nav-link" href="/jplearn/logout/?next=/jplearn/login">Log out</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <div class="container-fluid pt-3">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-xl-6">
+                <div class="table-responsive">
+                    <table id="dictionary" class="table table-striped table-bordered nowrap" style="width:100%; font-family:MYTTF">
+                        <thead style="font-family: ''">
+                            <tr>
+                                <th><!-- checked status --></th>
+                                <th>漢字</th>
+                                <th>仮名</th>
+                                <th>CHN</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid mt-5">
+        <small>
+            <p class="text-muted text-center font-weight-light">
+                zzd present
+        </small></p>
+    </div>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jq-3.3.1/dt-1.10.18/r-2.2.2/datatables.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+    <script>
+        $(document).ready(function () {
+            let table = $("#dictionary").DataTable({
+                lengthMenu: [5, 10, 20, 50],
+                pagelength: 5,
+                dom: 'ftrp',//'ftrpli',
+                pagingType: 'simple',
+
+                ajax: "data",
+                columns: [
+                    {
+                        data: 'checked',
+                        render: data => `<div class="text-center"><button class="btn btn-sm ${data ? "btn-success" : "btn-light"}" style="height: 25px; width: 25px"></button></div>`
+                    },
+                    { data: 'kanji' },
+                    {
+                        data: 'gana',
+                        //todo
+                    },
+                    {
+                        data: 'chn',
+                        render: data => `<span class="font-weight-light h6" style="font-family:''">${data}</span>`
+                    },
+                ],
+                columnDefs: [
+                    {
+                        
+                    }
+                ]
+            });
+
+            $("#dictionary").on("click", "button", function () {
+                let data = table.row($(this).parents('tr')).data();
+
+                let m = "";
+                if ($(this).hasClass("btn-success")) {
+                    $(this).removeClass("btn-success");
+                    m = "remove";
+                } else {
+                    $(this).removeClass("btn-light");
+                    m = "add";
+                }
+
+                $.getJSON("{% url 'jplearn:dictAction' %}", { "q": data['id'], "m": m })
+                    .done((function (json) {
+                        $(this).addClass(json.checkStatus ? "btn-success" : "btn-light");
+                    }).bind(this))
+                    .fail(function (jqXHR, textStatus, err) {
+                    })
+            })
+        })
+    </script>
+</body>
+
+</html>

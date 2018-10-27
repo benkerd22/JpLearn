@@ -36,17 +36,17 @@
 			<div class="row">
 				<div class="col"></div>
 				<div class="col-auto">
-					<div class="display-1 text-center bg-primary text-white shadow-none rounded">&nbsp;ジ&nbsp;</div>
+					<div class="display-1 text-center bg-primary text-white shadow-none rounded" style="height: 128px; width: 128px">ジ</div>
 				</div>
 				<div class="col"></div>
 			</div>
 
-			<h1 class="h3 pt-3 mb-3 font-weight-normal text-center">Please sign in</h1>
+			<h1 class="h3 pt-3 mb-3 font-weight-normal text-center mt-3">Please sign in</h1>
 			
 			<div class="row">
 				<div class="col"></div>
 				<div class="col-sm-4">
-					<form id="form" method="POST" action="{% url 'login' %}?next=/jplearn/test">
+					<form id="form" method="POST" action="{% url 'jplearn:login' %}?next={% url 'jplearn:test' %}">
 						{% csrf_token %}
 						<div class="form-group">
 							<label for="inputUsername" class="sr-only">Username</label>
@@ -72,13 +72,6 @@
 				<div class="col"></div>
 			</div>
 		</div>
-	</div>
-
-	<div class="container-fluid fixed-bottom">
-		<small>
-			<p class="text-muted text-center font-weight-light">
-				zzd present
-		</small></p>
 	</div>
 
 	<!-- Optional JavaScript -->
