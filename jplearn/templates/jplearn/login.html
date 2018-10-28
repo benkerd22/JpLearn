@@ -46,7 +46,7 @@
 			<div class="row">
 				<div class="col"></div>
 				<div class="col-sm-4">
-					<form id="form" method="POST" action="{% url 'jplearn:login' %}?next={% url 'jplearn:test' %}">
+					<form id="form" method="POST" action="{% url 'jplearn:login' %}?next={% url 'jplearn:start' %}">
 						{% csrf_token %}
 						<div class="form-group">
 							<label for="inputUsername" class="sr-only">Username</label>

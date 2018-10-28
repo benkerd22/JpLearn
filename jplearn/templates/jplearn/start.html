@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="A site for learning Japanese Words">
+    <meta name="author" content="zzd">
+
+    <title>JpLearn - Word list</title>
+
+    <!-- Bootstrap CSS -->
+    <link id="minCSS" rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <style>
+        @font-face {
+            font-family: "MYTTF";
+            src: url("{% url 'jplearn:ttf' %}");
+        }
+    </style>
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/jq-3.3.1/dt-1.10.18/r-2.2.2/datatables.min.css" />
+</head>
+
+<body>
+    <div class="sticky-top">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <a class="navbar-brand mb-1 h1" href="#">
+                <!--img src="/docs/4.1/assets/brand/bootstrap-solid.svg" width="30" height="30" class="d-inline-block align-top" alt="" -->JpLearn
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse w-100" id="navbarNavAltMarkup">
+                <ul class="nav navbar-nav">
+                    <li class="p-1 nav-item">
+                        <a class="nav-link" href="#">Home</a>
+                    </li>
+                    <li class="p-1 nav-item">
+                        <a class="nav-link active" href="{% url 'jplearn:test' %}">Test
+                            <span class="sr-only">(current)</span>
+                        </a>
+                    </li>
+                    <li class="p-1 nav-item">
+                        <a class="nav-link" href="{% url 'jplearn:dict' %}">Dictionary
+
+                        </a>
+                    </li>
+                    <li class="p-1 nav-item">
+                        <a id="toggleLightDark" class="nav-link disabled" href="#">Dark</a>
+                    </li>
+                    <li class="p-1 nav-item">
+                        <a class="nav-link" href="https://github.com/benkerd22/JpLearn">Github</a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav ml-auto">
+                    <li class="p-1 nav-item align-self-end">
+                        <a class="nav-link" href="{% url 'jplearn:logout' %}?next={% url 'jplearn:index' %}">Log out</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <div class="container-fluid pt-3">
+        <div class="row justify-content-center">
+            <div class="col-sm-6 col-xl-4 mx-2">
+                <div class="container-fluid my-2">
+                    <div class="h2 font-weight-light">
+                        Choose a book
+                    </div>
+
+                    <div id="list" class="list-group mt-3">
+                        {% for list in exists_list %}
+                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if not list.valid %}disabled{% endif %}"
+                            data-id="{{ forloop.counter0 }}">
+                            {{ list.name }}<span class="badge badge-secondary badge-pill">{{ list.count }}</span>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="container-fluid mt-4">
+                    <div class="h2 font-weight-light">
+                        Select a mode
+                    </div>
+
+                    <div id="btns" class="row mt-3">
+                        <div class="col">
+                            <button id="round" class="btn btn-block btn-outline-primary active" data-target="#random">Round</button>
+                        </div>
+                        <div class="col">
+                            <button id="random" class="btn btn-block btn-outline-secondary" data-target="#round">Random</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="container-fluid mt-5">
+                    <div class="row justify-content-center">
+                        <div class="col-sm-6">
+                            <div id="start" class="btn btn-block btn-lg btn-outline-success disabled">Start&nbsp;!</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="container-fluid mt-5">
+        <small>
+            <p class="text-muted text-center font-weight-light">
+                zzd present
+        </small></p>
+    </div>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jq-3.3.1/dt-1.10.18/r-2.2.2/datatables.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+
+    <script>
+        $("#list").on("click", "a", function() {
+            if ($(this).hasClass("active"))
+                    $(this).removeClass("active");
+                else
+                    $(this).addClass("active");
+        })
+
+        $("#list").click(function () {
+            let f = $("#list").find("a").toArray().reduce((f, a) => f || $(a).hasClass("active"), false);
+            if (f)
+                $("#start").removeClass("disabled");
+            else
+                $("#start").addClass("disabled");
+        })
+
+        $("#btns").on("click", "button", function () {
+            let active = "btn-outline-primary active";
+            let disabled = "btn-outline-secondary";
+            if ($(this).hasClass(active)) {
+                $(this).removeClass(active).addClass(disabled);
+                $($(this).data("target")).removeClass(disabled).addClass(active);
+            } else {
+                $(this).removeClass(disabled).addClass(active);
+                $($(this).data("target")).removeClass(active).addClass(disabled);
+            }
+        })
+
+        $("#start").click(function () {
+            if ($(this).hasClass("disabled"))
+                return;
+                
+            $("#start").addClass("disabled");
+
+            let m = $("#round").hasClass("active") ? "round" : "random"
+            let selected_list = []
+
+            $("#list").find("a").each(function () {
+                if ($(this).hasClass("active"))
+                    selected_list.push($(this).data("id"));
+            })
+
+            $.ajax({
+                url: "{% url 'jplearn:start' %}",
+                method: "POST",
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                data: JSON.stringify({
+                    "selected_list": selected_list,
+                    "mode": m,
+                }),
+                dataType: "json",
+            })
+                .done((function (json) {
+                    if (json.status == 302) {
+                        window.location.replace(json.location);
+                    }
+                }))
+                .fail(function () {
+                    $("#start").removeClass("disabled");
+                })
+        })
+    </script>
+</body>
+
+</html>
