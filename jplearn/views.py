@@ -112,7 +112,7 @@ def test(request):
 
         if request.method == 'POST':
             if in_test:
-                data = json.loads(request.body)
+                data = json.loads(request.body.decode('utf-8'))
                 action = data['action']
 
                 if action == 'getnext':
@@ -167,7 +167,7 @@ def test(request):
 def initTest(request):
     user = request.user.realuser
 
-    data = json.loads(request.body)
+    data = json.loads(request.body.decode('utf-8'))
     selected_list = data['selected_list']
     mode = data['mode']
 
@@ -272,7 +272,7 @@ def dictAction(request):
     user = request.user.realuser
 
     try:
-        data = json.loads(request.body)
+        data = json.loads(request.body.decode('utf-8'))
         action = data['action']
         wordpk = data['target']
 
