@@ -71,6 +71,7 @@
     <div class="container-fluid pt-3">
         <div class="row justify-content-center">
             <div class="col-md-5 col-xl-3">
+
                 <div class="container-fluid mb-2" style="height: 114px">
                     <span class="card card-body">
                         <div class="row">
@@ -215,7 +216,7 @@
                     <p class="font-weight-light h4">You have successfully finished a test containing <b id="wordCount"></b>
                         words!</p>
                     <hr>
-                    <div class="mb-0 font-weight-light h5">Feel free to start a new test!</div>
+                    <div class="mb-0 font-weight-light h5">What about starting a new test?</div>
                     <div class="row justify-content-end mt-3">
                         <div class="col flex-growth-1"></div>
                         <div class="col-auto">
@@ -374,13 +375,20 @@
                     .addClass("disabled invisible");
 
                 $("#gifrow").empty();
-                /*
-                json.urls.forEach(url => {
+                for (let i = 0; i < json.kanji.length; i++) {
+                    let code = json.kanji.charCodeAt(i);
+                    if (0x3040 <= code && code <= 0x30ff) {
+                        continue;
+                    }
+
+                    let hex = code.toString(16);
+                    let url = 'http://img.kakijun.com/kanjiphoto/gif/' + hex + '.gif';
                     $("#gifrow").append(
                         `<div class="col-2">
-                                <img src="${url.name}" class="img-fluid" alt="${url.alt}">
-                            </div>`);
-                })*/
+                            <img src="${url}" class="img-fluid" alt="${json.kanji[i]}">
+                        </div>`
+                    );
+                }
 
                 $("#gana").empty().append(`${json.gana}&nbsp;${json.tone}`);
 
