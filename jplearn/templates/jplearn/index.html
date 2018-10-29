@@ -125,13 +125,15 @@
                 </div>
 
                 <div class="container-fluid pb-3">
-                    <div class="row justify-content-between">
+                    <div class="row">
                         <div class="col">
-                            <button id="show" class="btn btn-outline-light" type="button" data-toggle="collapse"
-                                data-target="#detail" aria-expanded="false">⌄</button>
+                            <div class="col-sm-2 p-0 m-0">
+                                <button id="show" class="btn btn-block btn-outline-light" type="button" data-toggle="collapse"
+                                    data-target="#detail" aria-expanded="false">⌄</button></div>
                         </div>
-                        <div class="col">
-                            <button id="next" class="btn btn-outline-success float-right">next &raquo;</button>
+                        <div class="col-auto">
+                            <button id="next" class="btn btn-outline-success float-right ml-3">next &raquo;</button>
+                            <button id="previous" class="btn btn-outline-light float-right">&laquo;</button>
                         </div>
                     </div>
                 </div>
@@ -290,14 +292,16 @@
             })
 
         let getnextdone = function (json) {
-            console.log(json);
+            console.log(json)
             let refreshDisplay = function () {
+                localStorage.setItem('current_id', json.id);
+
                 if (json.status == 'continue')
                     $("#progress")
                         .attr("aria-valuenow", json.current)
                         .attr("aria-valuemax", json.max)
                         .css("width", json.current * 100 / json.max + '%');
-                else
+                else if (json.status == 'random_mode')
                     $("#progress_wrap").addClass("d-none");
 
                 if (json.checked) {
@@ -311,7 +315,6 @@
                         .css("filter", "opacity(20%)")
                         .data("status", 0);
                 }
-                $("#favBtn").data("wordid", json.id);
 
                 let randomArr = [];
                 $("#modeSettings").find("button").each(function () {
@@ -404,23 +407,26 @@
                 return;
             }
 
-            if ($("#detail").hasClass("show")) {
-                $("#detail")
-                    .collapse("hide")
-                    .on("hidden.bs.collapse", refreshDetail)
-            } else
-                refreshDetail();
+            if (json.status !== "not allowed") {
+                if ($("#detail").hasClass("show")) {
+                    $("#detail")
+                        .collapse("hide")
+                        .on("hidden.bs.collapse", refreshDetail)
+                } else
+                    refreshDetail();
+            }
 
             $("#next").removeClass("disabled");
+            $("#previous").removeClass("disabled");
         }
 
-        let getnext = function () {
+        let postAction = function (action) {
             $.ajax({
                 url: "{% url 'jplearn:test' %}",
                 method: "POST",
                 headers: { 'X-CSRFToken': '{{ csrf_token }}' },
                 data: JSON.stringify({
-                    "action": "getnext"
+                    "action": action,
                 }),
                 dataType: "json",
             })
@@ -433,7 +439,7 @@
         }
 
         $(document).ready(function () {
-            getnext();
+            postAction("new");
         })
 
         $("#show").click(function (e) {
@@ -446,7 +452,17 @@
                 return;
 
             $(this).addClass("disabled");
-            getnext();
+            $("#previous").addClass("disabled");
+            postAction("next");
+        })
+
+        $("#previous").click(function (e) {
+            if ($(this).hasClass("disabled"))
+                return;
+
+            $(this).addClass("disabled");
+            $("#next").addClass("disabled");
+            postAction("previous");
         })
 
         $("#quit").click(function (e) {
@@ -504,7 +520,7 @@
                 method: "POST",
                 headers: { 'X-CSRFToken': '{{ csrf_token }}' },
                 data: JSON.stringify({
-                    "target": Number($(this).data("wordid")),
+                    "target": localStorage.getItem('current_id'),
                     "action": m,
                 }),
                 dataType: "json",

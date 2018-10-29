@@ -60,13 +60,29 @@ def img(request, q):
         return FileResponse(open(fname, 'rb'))
     raise Http404()
 
-
-def getnext(request):
+def getRandom(request, action):
     user = request.user.realuser
+    status = request.session['dfa_status']
 
-    mode = request.session['mode']
+    # dfa logic:
+    if status == 0:
+        if action == 'next':
+            status = 0
+        elif action == 'previous':
+            status = 2
+    elif status == 1:
+        if action == 'next':
+            status = 0
+        elif action == 'previous':
+            status = 2
+    elif status == 2:
+        if action == 'next':
+            status = 1
+    else:
+        status = 3
 
-    if mode == 'random':
+    if status == 0:
+        # do the random selection
         selected_list = request.session['range']
 
         if 0 in selected_list and not 1 in selected_list:
@@ -76,46 +92,81 @@ def getnext(request):
 
         word = random.choice(real_list)
 
-        return JsonResponse({
-            'status': 'random_mode',
-            'kanji': word.kanji,
-            'gana': word.gana,
-            'tone': word.tone,
-            'chn': word.chn,
-            'id': word.pk,
-            'checked': word.realuser_set.filter(pk=user.pk).exists()
-        })
+        request.session['last'] = request.session['current'] # save last word
+        request.session['current'] = word.pk # save current word
 
-    if mode == 'round':
-        arrangment = request.session['arrangment']
+    if status == 1:
+        # show the current word
         current = request.session['current']
-        current += 1
+        if current is None:
+            status = 3
+        else:
+            word = Word.objects.get(pk=current)
 
-        if current == len(arrangment):
-            request.session['in_test'] = False
-            return JsonResponse({
-                'status': 'finish',
-                'max': len(arrangment),
-            })
+    if status == 2:
+        # show the current word
+        last = request.session['last']
+        if last is None:
+            status = 3
+        else:
+            word = Word.objects.get(pk=last)
 
-        wordpk = arrangment[current]
-        word = Word.objects.get(pk=wordpk)
-
-        request.session['current'] = current
-
+    if status == 3:
         return JsonResponse({
-            'status': 'continue',
-            'current': current,
-            'max': len(arrangment),
-            'kanji': word.kanji,
-            'gana': word.gana,
-            'tone': word.tone,
-            'chn': word.chn,
-            'id': word.pk,
-            'checked': word.realuser_set.filter(pk=user.pk).exists()
+            'status': 'not allowed'
         })
 
-    return HttpResponseBadRequest()
+    request.session['dfa_status'] = status
+
+    return JsonResponse({
+        'status': 'random_mode',
+        'kanji': word.kanji,
+        'gana': word.gana,
+        'tone': word.tone,
+        'chn': word.chn,
+        'id': word.pk,
+        'checked': word.realuser_set.filter(pk=user.pk).exists()
+    })
+
+def getRound(request, action):
+    user = request.user.realuser
+
+    arrangment = request.session['arrangment']
+    current = request.session['current']
+    if action == 'next':
+        current += 1
+    elif action == 'previous':
+        current -= 1
+
+    if current == -1:
+        return JsonResponse({
+            'status': 'not allowed',
+        })
+
+    if current == len(arrangment):
+        request.session['in_test'] = False
+        return JsonResponse({
+            'status': 'finish',
+            'max': len(arrangment),
+        })
+
+    wordpk = arrangment[current]
+    word = Word.objects.get(pk=wordpk)
+
+    request.session['current'] = current
+
+    return JsonResponse({
+        'status': 'continue',
+        'current': current,
+        'max': len(arrangment),
+        'kanji': word.kanji,
+        'gana': word.gana,
+        'tone': word.tone,
+        'chn': word.chn,
+        'id': word.pk,
+        'checked': word.realuser_set.filter(pk=user.pk).exists()
+    })
+
 
 
 @login_
@@ -132,10 +183,8 @@ def test(request):
         if request.method == 'POST':
             if in_test:
                 data = json.loads(request.body.decode('utf-8'))
+                mode = request.session['mode']
                 action = data['action']
-
-                if action == 'getnext':
-                    return getnext(request)
 
                 if action == 'quit':
                     request.session['in_test'] = False
@@ -143,6 +192,12 @@ def test(request):
                         'status': 302,
                         'location': reverse_lazy('jplearn:test'),
                     })
+                
+                if mode == 'round':
+                    return getRound(request, action)
+
+                if mode == 'random':
+                    return getRandom(request, action)
 
             return HttpResponseBadRequest()
 
@@ -205,10 +260,15 @@ def initTest(request):
         arrangment = [word.pk for word in real_list]
         random.shuffle(arrangment)
         request.session['arrangment'] = arrangment
-        request.session['current'] = -1
-    else:
+        request.session['current'] = 0
+    elif mode == 'random':
         request.session['mode'] = 'random'
         request.session['range'] = selected_list
+        request.session['current'] = None
+        request.session['last'] = None
+        request.session['dfa_status'] = 0
+    else:
+        return HttpResponseBadRequest()
 
     return JsonResponse({
         'status': 302,

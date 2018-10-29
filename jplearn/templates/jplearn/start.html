@@ -128,6 +128,9 @@
 
     <script>
         $("#list").on("click", "a", function() {
+            if ($(this).hasClass("disabled"))
+                return;
+                
             if ($(this).hasClass("active"))
                     $(this).removeClass("active");
                 else
