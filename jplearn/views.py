@@ -58,19 +58,30 @@ def getnext(request):
     user = request.user.realuser
 
     mode = request.session['mode']
-    arrangment = request.session.get('arrangment', [])
-    current = request.session.get('current', -1)
-    current += 1
 
     if mode == 'random':
         selected_list = request.session['range']
+
         if 0 in selected_list and not 1 in selected_list:
             real_list = user.liked_words.all()
         else:
             real_list = Word.objects.all()
 
         word = random.choice(real_list)
-    elif mode == 'round':
+
+        return JsonResponse({
+            'status': 'random_mode',
+            'kanji': word.kanji,
+            'gana': word.gana,
+            'tone': word.tone,
+            'chn': word.chn,
+            'id': word.pk,
+        })
+
+    if mode == 'round':
+        arrangment = request.session['arrangment']
+        current = request.session['current']
+
         if current == len(arrangment):
             request.session['in_test'] = False
             return JsonResponse({
@@ -82,26 +93,24 @@ def getnext(request):
         word = Word.objects.get(pk=wordpk)
 
         request.session['current'] = current
-    else:
-        return HttpResponseBadRequest()
 
-    res = {
-        'status': 'continue',
-        'current': current,
-        'max': len(arrangment),
-        'kanji': word.kanji,
-        'gana': word.gana,
-        'tone': word.tone,
-        'chn': word.chn,
-        'id': word.pk,
-    }
+        return JsonResponse({
+            'status': 'continue',
+            'current': current,
+            'max': len(arrangment),
+            'kanji': word.kanji,
+            'gana': word.gana,
+            'tone': word.tone,
+            'chn': word.chn,
+            'id': word.pk,
+        })
 
-    return JsonResponse(res)
+    return HttpResponseBadRequest()
 
 
 @login_
 def test(request):
-    if True:
+    try:
         in_test = request.session.get('in_test', False)
 
         if request.method == 'GET':
@@ -128,7 +137,7 @@ def test(request):
             return HttpResponseBadRequest()
 
         return HttpResponseNotAllowed(['GET', 'POST'])
-    else:
+    except:
         return HttpResponseBadRequest()
 
 
@@ -227,10 +236,10 @@ def start(request):
         if in_test:
             return HttpResponseBadRequest()
 
-        # try:
-        return initTest(request)
-        # except:
-        return HttpResponseBadRequest()
+        try:
+            return initTest(request)
+        except:
+            return HttpResponseBadRequest()
 
     return HttpResponseNotAllowed(['GET', 'POST'])
 

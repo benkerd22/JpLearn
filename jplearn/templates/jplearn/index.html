@@ -87,7 +87,7 @@
                 </div>
 
                 <div class="container-fluid pb-2">
-                    <div class="progress" style="height: 8px">
+                    <div id="progress_wrap" class="progress" style="height: 8px">
                         <div id="progress" class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0"
                             aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
@@ -287,9 +287,13 @@
         let getnextdone = function (json) {
             console.log(json);
             let refreshDisplay = function () {
-                $("#progress")
-                    .attr("aria-valuenow", json.current.toString())
-                    .attr("aria-valuemax", (json.max - 1).toString());
+                if (json.status == 'continue')
+                    $("#progress")
+                        .attr("aria-valuenow", json.current)
+                        .attr("aria-valuemax", json.max)
+                        .css("width", json.current * 100 / json.max + '%');
+                else
+                    $("#progress_wrap").addClass("d-none");
 
                 let randomArr = [];
                 $("#modeSettings").find("button").each(function () {
@@ -372,6 +376,11 @@
             }
 
             if (json.status === "finish") {
+                $("#progress")
+                    .attr("aria-valuenow", json.max)
+                    .attr("aria-valuemax", json.max)
+                    .css("width", '100%');
+
                 $("#wordCount").text(json.max);
                 $("#successAlert").modal("show");
                 return;
