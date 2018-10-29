@@ -42,8 +42,8 @@ def login_(function=None, status=302):
 
 @login_(status=403)
 def audio(request, q):
-    fname = urllib.parse.unquote(q)
-    fname = 'jplearn/audio/' + fname + '.mp3'
+    q = urllib.parse.unquote(q)
+    fname = 'jplearn/audio/' + q + '.mp3'
     if os.path.exists(fname):
         return FileResponse(open(fname, 'rb'))
     raise Http404()
@@ -52,6 +52,13 @@ def audio(request, q):
 @login_(status=403)
 def ttf(request):
     return FileResponse(open('jplearn/font/my.ttf', 'rb'))
+
+def img(request, q):
+    q = urllib.parse.unquote(q)
+    fname = 'jplearn/icon/' + q
+    if os.path.exists(fname):
+        return FileResponse(open(fname, 'rb'))
+    raise Http404()
 
 
 def getnext(request):
@@ -76,11 +83,13 @@ def getnext(request):
             'tone': word.tone,
             'chn': word.chn,
             'id': word.pk,
+            'checked': word.realuser_set.filter(pk=user.pk).exists()
         })
 
     if mode == 'round':
         arrangment = request.session['arrangment']
         current = request.session['current']
+        current += 1
 
         if current == len(arrangment):
             request.session['in_test'] = False
@@ -103,6 +112,7 @@ def getnext(request):
             'tone': word.tone,
             'chn': word.chn,
             'id': word.pk,
+            'checked': word.realuser_set.filter(pk=user.pk).exists()
         })
 
     return HttpResponseBadRequest()
@@ -218,7 +228,7 @@ def start(request):
                     {
                         'name': 'My Book',
                         'count': user.liked_words.all().count(),
-                        'valid': user.liked_words.all().count() >= 0,
+                        'valid': user.liked_words.all().count() > 0,
                     },
                     {
                         'name': '《综合日语》（一）',

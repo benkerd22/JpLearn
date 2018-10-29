@@ -134,11 +134,11 @@
             $("#dictionary").on("click", "button", function () {
                 if ($(this).hasClass("disabled"))
                     return;
+                $(this).addClass("disabled");
                     
                 let data = table.row($(this).parents('tr')).data();
 
                 let m = "";
-                $(this).addClass("disabled");
                 if ($(this).hasClass("btn-success")) {
                     $(this).removeClass("btn-success");
                     m = "remove";
@@ -158,12 +158,13 @@
                     dataType: "json",
                 })
                     .done((function (json) {
-                        $(this)
-                            .addClass(json.checkStatus ? "btn-success" : "btn-light")
-                            .removeClass("disabled")
+                        $(this).addClass(json.checkStatus ? "btn-success" : "btn-light");
                     }).bind(this))
                     .fail(function (jqXHR, textStatus, err) {
                     })
+                    .always((function() {
+                        $(this).removeClass("disabled");
+                    }).bind(this))
             })
         })
     </script>

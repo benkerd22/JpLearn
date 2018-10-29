@@ -15,7 +15,7 @@
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
     <style>
-        .settingBtn {
+        .imgBtn {
             height: 20px;
             filter: opacity(20%);
         }
@@ -82,14 +82,18 @@
                             <div class="row align-items-center justify-content-center">
                                 <div class="col"><button id="play" class="btn btn-light btn-sm disabled">▷</button></div>
                             </div>
+                            <div class="col">
+                                <img id="favBtn" src="{% url 'jplearn:img' %}/unchecked.png" alt="add/remove" class="rounded float-right imgBtn"
+                                    data-status="0" data-wordid="null">
+                            </div>
                         </div>
                     </span>
                 </div>
 
                 <div class="container-fluid pb-2">
                     <div id="progress_wrap" class="progress" style="height: 8px">
-                        <div id="progress" class="progress-bar" role="progressbar" style="width: 0%" aria-valuenow="0"
-                            aria-valuemin="0" aria-valuemax="100"></div>
+                        <div id="progress" class="progress-bar bg-info" role="progressbar" style="width: 0%"
+                            aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                 </div>
 
@@ -134,7 +138,7 @@
 
                 <div class="container-fluid pb-2">
                     <img id="settingBtn" src="https://cdn4.iconfinder.com/data/icons/forgen-phone-settings/48/setting-512.png"
-                        alt="Settings" class="rounded float-right settingBtn" data-toggle="collapse" data-target="#modeSettings">
+                        alt="Settings" class="rounded float-right imgBtn" data-toggle="collapse" data-target="#modeSettings">
                 </div>
 
                 <div class="container-fluid pb-2 my-4">
@@ -206,15 +210,16 @@
             <div class="col-sm-8 col-lg-4">
                 <div class="alert alert-success" role="alert">
                     <div class="alert-heading font-weight-light h1">Well done!</div>
-                    <p class="font-weight-light h4">You have successfully finished a test containing <b id="wordCount"></b> words!</p>
+                    <p class="font-weight-light h4">You have successfully finished a test containing <b id="wordCount"></b>
+                        words!</p>
                     <hr>
                     <div class="mb-0 font-weight-light h5">Feel free to start a new test!</div>
                     <div class="row justify-content-end mt-3">
-                            <div class="col flex-growth-1"></div>
-                            <div class="col-auto">
-                                <a href="{% url 'jplearn:start' %}" class="btn btn-outline-success">continue</a>
-                            </div>
+                        <div class="col flex-growth-1"></div>
+                        <div class="col-auto">
+                            <a href="{% url 'jplearn:start' %}" class="btn btn-outline-success">continue</a>
                         </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -294,6 +299,19 @@
                         .css("width", json.current * 100 / json.max + '%');
                 else
                     $("#progress_wrap").addClass("d-none");
+
+                if (json.checked) {
+                    $("#favBtn")
+                        .attr("src", "{% url 'jplearn:img' %}/checked.png")
+                        .css("filter", "opacity(100%)")
+                        .data("status", 1);
+                } else {
+                    $("#favBtn")
+                        .attr("src", "{% url 'jplearn:img' %}/unchecked.png")
+                        .css("filter", "opacity(20%)")
+                        .data("status", 0);
+                }
+                $("#favBtn").data("wordid", json.id);
 
                 let randomArr = [];
                 $("#modeSettings").find("button").each(function () {
@@ -392,7 +410,7 @@
                     .on("hidden.bs.collapse", refreshDetail)
             } else
                 refreshDetail();
-            
+
             $("#next").removeClass("disabled");
         }
 
@@ -472,6 +490,43 @@
                     .attr("crossorigin", "anonymous");
                 $("#settingBtn").css("filter", "invert(50%)");
             }
+        })
+
+        $("#favBtn").click(function (e) {
+            if ($(this).hasClass("disabled"))
+                return;
+            $(this).addClass("disabled");
+
+            let m = $(this).data("status") == "0" ? "add" : "remove";
+
+            $.ajax({
+                url: "{% url 'jplearn:dictAction' %}",
+                method: "POST",
+                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                data: JSON.stringify({
+                    "target": Number($(this).data("wordid")),
+                    "action": m,
+                }),
+                dataType: "json",
+            })
+                .done(function (json) {
+                    if (json.checkStatus) {
+                        $("#favBtn")
+                            .attr("src", "{% url 'jplearn:img' %}/checked.png")
+                            .css("filter", "opacity(100%)")
+                            .data("status", 1);
+                    } else {
+                        $("#favBtn")
+                            .attr("src", "{% url 'jplearn:img' %}/unchecked.png")
+                            .css("filter", "opacity(20%)")
+                            .data("status", 0);
+                    }
+                })
+                .fail(function (jqXHR, testStatus, err) {
+                })
+                .always(function () {
+                    $("#favBtn").removeClass("disabled");
+                })
         })
     </script>
 </body>
