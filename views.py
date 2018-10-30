@@ -14,7 +14,6 @@ from jplearn.models import Word
 
 
 def login_(function=None, status=302):
-
     def decorator(view_func):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):
@@ -32,29 +31,6 @@ def login_(function=None, status=302):
     if function:
         return decorator(function)
     return decorator
-
-
-@login_(status=403)
-def audio(request, q):
-    q = urllib.parse.unquote(q)
-    fname = 'jplearn/audio/' + q + '.mp3'
-    if os.path.exists(fname):
-        return FileResponse(open(fname, 'rb'))
-    raise Http404()
-
-
-@login_(status=403)
-def ttf(request):
-    return FileResponse(open('jplearn/font/my.ttf', 'rb'))
-
-
-def img(request, q):
-    q = urllib.parse.unquote(q)
-    fname = 'jplearn/icon/' + q
-    if os.path.exists(fname):
-        return FileResponse(open(fname, 'rb'))
-    raise Http404()
-
 
 def getRandom(request, action):
     user = request.user.realuser
@@ -172,7 +148,7 @@ def test(request):
 
         if request.method == 'GET':
             if in_test:
-                return render(request, 'jplearn/index.html')
+                return render(request, 'jplearn/test.html')
 
             return HttpResponseRedirect(reverse_lazy('jplearn:start'))
 
