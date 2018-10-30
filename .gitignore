@@ -1,4 +1,6 @@
-jplearn/audio/
+audio/
+dictionary/
+font/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
