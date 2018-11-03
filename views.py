@@ -3,9 +3,7 @@
 '''
 
 import random
-import urllib
 import json
-import os
 from functools import wraps
 from django.shortcuts import render
 from django.http import *
@@ -32,25 +30,29 @@ def login_(function=None, status=302):
         return decorator(function)
     return decorator
 
+
 def getRandom(request, action):
     user = request.user.realuser
     status = request.session['dfa_status']
 
     # dfa logic:
     if status == 0:
-        if action == 'next':
+        if action in ('next', 'prefetch'):
             status = 0
-        elif action == 'previous':
+        elif action in ('previous', 'prelast'):
             status = 2
     elif status == 1:
-        if action == 'next':
+        if action in ('next', 'prefetch'):
             status = 0
-        elif action == 'previous':
+        elif action in ('previous', 'prelast'):
             status = 2
     elif status == 2:
-        if action == 'next':
+        if action in ('next', 'prefetch'):
             status = 1
-    else:
+        elif action in ('previous', 'prelast'):
+            status = 3
+
+    if not action in ('next', 'prefetch', 'previous', 'prelast', 'new'):
         status = 3
 
     if status == 0:
@@ -76,7 +78,7 @@ def getRandom(request, action):
             word = Word.objects.get(pk=current)
 
     if status == 2:
-        # show the current word
+        # show the last word
         last = request.session['last']
         if last is None:
             status = 3
@@ -88,7 +90,11 @@ def getRandom(request, action):
             'status': 'not allowed'
         })
 
-    request.session['dfa_status'] = status
+    if action in ('next', 'previous'):
+        request.session['dfa_status'] = status
+        return JsonResponse({
+            'status': 'success',
+        })
 
     return JsonResponse({
         'status': 'random_mode',
@@ -110,6 +116,14 @@ def getRound(request, action):
         current += 1
     elif action == 'previous':
         current -= 1
+    elif action == 'new':
+        pass
+    elif action == 'prefetch':
+        current += 1
+    elif action == 'prelast':
+        current -= 1
+    else:
+        return HttpResponseBadRequest()
 
     if current == -1:
         return JsonResponse({
@@ -126,7 +140,11 @@ def getRound(request, action):
     wordpk = arrangment[current]
     word = Word.objects.get(pk=wordpk)
 
-    request.session['current'] = current
+    if action in ('next', 'previous'):
+        request.session['current'] = current
+        return JsonResponse({
+            'status': 'success',
+        })
 
     return JsonResponse({
         'status': 'continue',
@@ -231,7 +249,7 @@ def start(request):
                         'valid': user.liked_words.all().count() > 0,
                     },
                     {
-                        'name': '《综合日语》（一）',
+                        'name': '《初级日语 一》(1-4)',
                         'count': Word.objects.all().count(),
                         'valid': True,
                     }
@@ -305,6 +323,6 @@ def dictAction(request):
         else:
             return HttpResponseBadRequest()
 
-        return JsonResponse({'checkStatus': status})
+        return JsonResponse({'checked': status})
     except:
         return HttpResponseBadRequest()

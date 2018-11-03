@@ -18,6 +18,11 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.css"/>
 
     <style>
+        .favBtn {
+            height: 20px;
+            
+        }
+
         @font-face {
             font-family: "MYTTF";
             src: url("{% static 'jplearn/font/my.ttf' %}");
@@ -93,6 +98,8 @@
         </small></p>
     </div>
 
+    <span id="csrf_token" class="d-none">{{ csrf_token }}</span>
+
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
@@ -103,6 +110,9 @@
 
     <!-- DataTable JS -->
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.js"></script>
+
+    <script src="{% static 'jplearn/js/tools.js' %}"></script>
+    <script src="{% static 'jplearn/js/favBtn.js' %}"></script>
 
     <script>
         $(document).ready(function () {
@@ -122,7 +132,10 @@
                             } else if (type == "filter") {
                                 return "";
                             } else {
-                                return `<div class="text-center"><button class="btn btn-sm ${data ? "btn-success" : "btn-light"}" style="height: 25px; width: 25px"></button></div>`;
+                                return `<div class="text-center">
+                                            <img src="{% static 'jplearn/img' %}/${data ? "checked.png" : "unchecked.png"}" alt="add/remove" class="favBtn" 
+                                            data-checked="${!!data}" data-target="${row['id']}">
+                                        </div>`;
                             }
                         }
                     },
@@ -136,8 +149,12 @@
                         render: data => `<span class="font-weight-light h6" style="font-family:''">${data}</span>`
                     },
                 ],
-            });
 
+                initComplete: function() {
+                    FavBtn("{% static 'jplearn/img/checked.png' %}", "{% static 'jplearn/img/unchecked.png' %}", "{% url 'jplearn:dictAction' %}");
+                }
+            });
+/*
             $("#dictionary").on("click", "button", function () {
                 if ($(this).hasClass("disabled"))
                     return;
@@ -165,14 +182,14 @@
                     dataType: "json",
                 })
                     .done((function (json) {
-                        $(this).addClass(json.checkStatus ? "btn-success" : "btn-light");
+                        $(this).addClass(json.checked ? "btn-success" : "btn-light");
                     }).bind(this))
                     .fail(function (jqXHR, textStatus, err) {
                     })
                     .always((function () {
                         $(this).removeClass("disabled");
                     }).bind(this))
-            })
+            })*/
         })
     </script>
 </body>

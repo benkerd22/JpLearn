@@ -16,10 +16,18 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
         crossorigin="anonymous">
 
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css" integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns"
+        crossorigin="anonymous">
+
     <style>
         .imgBtn {
             height: 20px;
             filter: opacity(20%);
+        }
+
+        .favBtn {
+            height: 20px;
         }
 
         @font-face {
@@ -68,29 +76,70 @@
         </nav>
     </div>
 
-    <audio id="pronunce" src=""></audio>
+    <audio src=""></audio>
 
     <div class="container-fluid pt-3">
         <div class="row justify-content-center">
             <div class="col-md-5 col-xl-3">
+                <div id="displayBlock-container" class="container-fluid mb-2" style="overflow:hidden; height: 120px;">
 
-                <div class="container-fluid mb-2" style="height: 114px">
-                    <span class="card card-body">
-                        <div class="row">
-                            <div class="col-auto pr-2">
-                                <div id="realDisplay" class="" style="font-family: MYTTF">
-                                    <!-- To be displayed -->
+                    <div id="card-1" class="container my-0 p-0 displayBlock" style="position: relative; top:0px; left:-500px; height: 200px;">
+                        <span class="card card-body">
+                            <div class="row">
+                                <div class="col-auto pr-2">
+                                    <div class="displayText" style="font-family: MYTTF">
+                                        <!-- To be displayed -->いい
+                                    </div>
+                                </div>
+                                <div class="row align-items-center justify-content-center">
+                                    <div class="col"><button class="btn btn-light btn-sm disabled playBtn">▷</button></div>
+                                </div>
+                                <div class="col">
+                                    <img src="{% static 'jplearn/img/unchecked.png' %}" alt="add/remove" class="rounded float-right imgBtn"
+                                        data-status="0" data-target="">
                                 </div>
                             </div>
-                            <div class="row align-items-center justify-content-center">
-                                <div class="col"><button id="play" class="btn btn-light btn-sm disabled">▷</button></div>
+                        </span>
+                    </div>
+
+                    <div id="card0" class="container my-0 p-0 displayBlock" style="position: relative; top:-200px; left:0px; height: 200px;">
+                        <span class="card card-body">
+                            <div class="row">
+                                <div class="col-auto pr-2">
+                                    <div class="displayText" style="font-family: MYTTF">
+                                        <!-- To be displayed -->
+                                    </div>
+                                </div>
+                                <div class="row align-items-center justify-content-center">
+                                    <div class="col"><button class="btn btn-light btn-sm disabled playBtn">▷</button></div>
+                                </div>
+                                <div class="col">
+                                    <img src="{% static 'jplearn/img/unchecked.png' %}" alt="add/remove" class="rounded float-right favBtn"
+                                        data-status="0" data-target="">
+                                </div>
                             </div>
-                            <div class="col">
-                                <img id="favBtn" src="{% static 'jplearn/img/unchecked.png' %}" alt="add/remove" class="rounded float-right imgBtn"
-                                    data-status="0">
+                        </span>
+                    </div>
+
+                    <div id="card1" class="container my-0 p-0 displayBlock" style="position: relative; top:-400px; left:500px; height: 200px;">
+                        <span class="card card-body">
+                            <div class="row">
+                                <div class="col-auto pr-2">
+                                    <div class="displayText" style="font-family: MYTTF">
+                                        <!-- To be displayed -->いい
+                                    </div>
+                                </div>
+                                <div class="row align-items-center justify-content-center">
+                                    <div class="col"><button class="btn btn-light btn-sm disabled playBtn">▷</button></div>
+                                </div>
+                                <div class="col">
+                                    <img src="{% static 'jplearn/img/unchecked.png' %}" alt="add/remove" class="rounded float-right imgBtn"
+                                        data-status="0" data-target="">
+                                </div>
                             </div>
-                        </div>
-                    </span>
+                        </span>
+                    </div>
+
                 </div>
 
                 <div class="container-fluid pb-2">
@@ -101,26 +150,26 @@
                 </div>
 
                 <div class="container-fluid m-0 pb-3">
-                    <div id="detail" class="collapse">
+                    <div id="wordCard" class="wordCard collapse">
                         <div class="card card-body">
                             <div class="container-fluid pb-3">
-                                <div id="gifrow" class="row no-gutters">
+                                <div class="row no-gutters wordCard-gifrow">
                                     <!-- Gif show here -->
                                 </div>
                             </div>
                             <div class="container-fluid pb-3">
                                 <div class="row">
                                     <div class="col-auto">
-                                        <p id="gana" class="h3 font-weight-light" style="font-family: MYTTF"></p>
+                                        <p class="h3 font-weight-light wordCard-gana" style="font-family: MYTTF"></p>
                                     </div>
                                     <div class="w-100"></div>
                                     <div class="col-auto">
-                                        <p id="kanji" class="h3 font-weight-light" style="font-family: MYTTF"></p>
+                                        <p class="h3 font-weight-light wordCard-kanji" style="font-family: MYTTF"></p>
                                     </div>
                                 </div>
                             </div>
                             <div class="container-fluid">
-                                <div id="chn" class="h6 text-muted font-weight-light">
+                                <div class="h6 text-muted font-weight-light wordCard-chn">
                                 </div>
                             </div>
                         </div>
@@ -132,7 +181,7 @@
                         <div class="col">
                             <div class="col-sm-2 p-0 m-0">
                                 <button id="show" class="btn btn-block btn-outline-light" type="button" data-toggle="collapse"
-                                    data-target="#detail" aria-expanded="false">⌄</button></div>
+                                    data-target=".wordCard" aria-expanded="false">⌄</button></div>
                         </div>
                         <div class="col-auto">
                             <button id="next" class="btn btn-outline-success float-right ml-3">next &raquo;</button>
@@ -143,27 +192,27 @@
 
                 <div class="container-fluid pb-2">
                     <img id="settingBtn" src="https://cdn4.iconfinder.com/data/icons/forgen-phone-settings/48/setting-512.png"
-                        alt="Settings" class="rounded float-right imgBtn" data-toggle="collapse" data-target="#modeSettings">
+                        alt="Settings" class="rounded float-right imgBtn" data-toggle="collapse" data-target=".modeSettingBlock">
                 </div>
 
                 <div class="container-fluid pb-2 my-4">
-                    <div id="modeSettings" class="collapse">
+                    <div class="collapse modeSettingBlock">
                         <div class="row justify-content-end">
                             <div class="col"></div>
                             <div class="col-sm-auto">
                                 <div class="card card-body">
                                     <div class="row justify-content-center">
                                         <div class="col-auto text-center">
-                                            <button class="btn btn-sm btn-light" data-target="1" id="kanjiCheck">漢字</button>
+                                            <button class="btn btn-sm btn-light modeBtn" data-target="0" id="kanjiCheck">漢字</button>
                                         </div>
                                         <div class="col-auto text-center">
-                                            <button class="btn btn-sm btn-light" data-target="2">仮名</button>
+                                            <button class="btn btn-sm btn-light modeBtn" data-target="1">仮名</button>
                                         </div>
                                         <div class="col-auto text-center">
-                                            <button class="btn btn-sm btn-light" data-target="3">CHN</button>
+                                            <button class="btn btn-sm btn-light modeBtn" data-target="2">CHN</button>
                                         </div>
                                         <div class="col-auto text-center">
-                                            <button class="btn btn-sm btn-light" data-target="4">♪</button>
+                                            <button class="btn btn-sm btn-light modeBtn" data-target="3">♪</button>
                                         </div>
                                     </div>
                                 </div>
@@ -180,7 +229,6 @@
             </div>
         </div>
     </div>
-    <br /><br /><br /><br /><br /><br />
 
     <div class="container-fluid fixed-bottom">
         <small>
@@ -230,6 +278,8 @@
         </div>
     </div>
 
+    <span id="csrf_token" class="d-none">{{ csrf_token }}</span>
+
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
@@ -238,261 +288,76 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
         crossorigin="anonymous"></script>
 
+    <script src="{% static 'jplearn/js/tools.js' %}"></script>
+    <script src="{% static 'jplearn/js/inputManager.js' %}"></script>
+    <script src="{% static 'jplearn/js/favBtn.js' %}"></script>
+    <script src="{% static 'jplearn/js/playBtn.js' %}"></script>
+    <script src="{% static 'jplearn/js/modeSettingBlock.js' %}"></script>
+    <script src="{% static 'jplearn/js/displayBlock.js' %}"></script>
+    <script src="{% static 'jplearn/js/wordCard.js' %}"></script>
+
     <script>
         "use strict"
 
-        $("#modeSettings").find("button").each(function () {
-            let onclick = function (e) {
-                if (this.hasClass("btn-light")) {
-                    this.removeClass("btn-light");
-                    this.addClass("btn-primary");
-                } else {
-                    this.removeClass("btn-primary");
-                    this.addClass("btn-light");
-                }
-            }
-            $(this).click(onclick.bind($(this)));
-        })
+        /*
+                let refreshDisplay = function (json) {
+                    //localStorage.setItem('current_id', json.id);
 
-        let media = $("audio")[0];
-        let autoRepeatTimes = 2;
-
-        $("#play").click(function (e) {
-            if ($("#play").hasClass("disabled"))
-                return;
-
-            $("#play").addClass("disabled").text("♪");
-            autoRepeatTimes = 1;
-            $(media).trigger("play");
-        })
-
-        $(media)
-            .on("pause", function () {
-                if (autoRepeatTimes == 0)
-                    return;
-
-                autoRepeatTimes--;
-                if (autoRepeatTimes == 0) {
-                    $("#play").removeClass("disabled").text("▷");
-                } else {
-                    $(media).trigger("play");
-                }
-            })
-            .on("loadstart", function () {
-                $("#play").addClass("disabled invisible");
-            })
-            .on("canplaythrough", function () {
-                $("#play").removeClass("disabled invisible");
-                if (autoRepeatTimes > 0) {
-                    $("#play").addClass("disabled").text("♪");
-
-                    $(media).trigger("play");
-                }
-            })
-
-        let getnextdone = function (json) {
-            console.log(json)
-            let refreshDisplay = function () {
-                localStorage.setItem('current_id', json.id);
-
-                if (json.status == 'continue')
-                    $("#progress")
+                    if (json.status == 'continue')
+                        $("#progress")
                         .attr("aria-valuenow", json.current)
                         .attr("aria-valuemax", json.max)
                         .css("width", json.current * 100 / json.max + '%');
-                else if (json.status == 'random_mode')
-                    $("#progress_wrap").addClass("d-none");
+                    else if (json.status == 'random_mode')
+                        $("#progress_wrap").addClass("d-none");
 
-                if (json.checked) {
-                    $("#favBtn")
-                        .attr("src", "{% static 'jplearn/img/checked.png' %}")
-                        .css("filter", "opacity(100%)")
-                        .data("status", 1);
-                } else {
-                    $("#favBtn")
-                        .attr("src", "{% static 'jplearn/img/unchecked.png' %}")
-                        .css("filter", "opacity(20%)")
-                        .data("status", 0);
+
                 }
 
-                let randomArr = [];
-                $("#modeSettings").find("button").each(function () {
-                    if ($(this).hasClass("btn-primary")) {
-                        randomArr.push(parseInt($(this).data("target")));
-                    }
-                })
+                let postActionDone = function (json) {
+                    //console.log(json)
 
-                $("#realDisplay").text("");
+                    if (json.status === "finish") {
+                        $("#progress")
+                            .attr("aria-valuenow", json.max)
+                            .attr("aria-valuemax", json.max)
+                            .css("width", '100%');
 
-                let rand = randomArr[Math.floor(Math.random() * randomArr.length)];
-                if (typeof (rand) == "undefined") {
-                    $("#kanjiCheck").click();
-                    rand = 1;
-                }
-
-                autoRepeatTimes = rand === 4 ? 2 : 0;
-                autoRepeatTimes = 0;
-                if (rand === 4) {
-                    autoRepeatTimes = 2;
-                    $("#pronunce").trigger("load");
-                    return;
-                }
-                $("#pronunce").trigger("load");
-
-                if (rand === 3) {
-                    $("#realDisplay")
-                        .text(json.chn)
-                        .css("font-family", "")
-                        .removeClass("h2")
-                        .addClass("h1 lead");
-                    return;
-                }
-
-                if (rand === 1 && json.kanji !== json.gana) {
-                    $("#realDisplay")
-                        .text(json.kanji)
-                        .css("font-family", "MYTTF")
-                        .removeClass("h2 lead")
-                        .addClass("h1");
-                    return;
-                }
-
-                $("#realDisplay")
-                    .empty()
-                    .append(`${json.gana}<small>&nbsp;${json.tone}</small>`)
-                    .css("font-family", "MYTTF")
-                    .removeClass("lead h1 h2")
-                    .addClass(json.gana.length >= 6 ? "h2" : "h1");
-            }
-
-            let refreshDetail = function () {
-                $("#pronunce").attr("src", `{% static 'jplearn/audio' %}/${json.gana}.mp3`);
-
-                $("#play")
-                    .text("▷")
-                    .addClass("disabled invisible");
-
-                $("#gifrow").empty();
-                for (let i = 0; i < json.kanji.length; i++) {
-                    let code = json.kanji.charCodeAt(i);
-                    if (0x3040 <= code && code <= 0x30ff) {
-                        continue;
+                        $("#wordCount").text(json.max);
+                        $("#successAlert").modal("show");
+                        return;
                     }
 
-                    let hex = code.toString(16);
-                    let url = 'http://img.kakijun.com/kanjiphoto/gif/' + hex + '.gif';
-                    $("#gifrow").append(
-                        `<div class="col-2">
-                            <img src="${url}" class="img-fluid" alt="${json.kanji[i]}">
-                        </div>`
-                    );
-                }
+                    if (json.status !== "not allowed") {
+                        
+                    }
 
-                $("#gana").empty().append(`${json.gana}&nbsp;${json.tone}`);
+                    $("#next").removeClass("disabled");
+                    $("#previous").removeClass("disabled");
+                }*/
 
-                $("#kanji").text("");
-                if (json.gana != json.kanji) {
-                    $("#kanji").text(json.kanji);
-                }
 
-                $("#chn").text(json.chn);
-
-                refreshDisplay();
-
-                $("#detail").off();
-            }
-
-            if (json.status === "finish") {
-                $("#progress")
-                    .attr("aria-valuenow", json.max)
-                    .attr("aria-valuemax", json.max)
-                    .css("width", '100%');
-
-                $("#wordCount").text(json.max);
-                $("#successAlert").modal("show");
-                return;
-            }
-
-            if (json.status !== "not allowed") {
-                if ($("#detail").hasClass("show")) {
-                    $("#detail")
-                        .collapse("hide")
-                        .on("hidden.bs.collapse", refreshDetail)
-                } else
-                    refreshDetail();
-            }
-
-            $("#next").removeClass("disabled");
-            $("#previous").removeClass("disabled");
-        }
-
-        let postAction = function (action) {
-            $.ajax({
-                url: "{% url 'jplearn:test' %}",
-                method: "POST",
-                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-                data: JSON.stringify({
-                    "action": action,
-                }),
-                dataType: "json",
-            })
-                .done(function (json) {
-                    getnextdone(json);
-                })
-                .fail(function (jqXHR, textStatus, err) {
-                    console.log(err);
-                });
-        }
-
-        $(document).ready(function () {
-            postAction("new");
-        })
 
         $("#show").click(function (e) {
-            let t = document.getElementById("show").textContent;
-            $("#show").text(t == "⌄" ? "⌃" : "⌄");
-        })
-
-        $("#next").click(function (e) {
-            if ($(this).hasClass("disabled"))
-                return;
-
-            $(this).addClass("disabled");
-            $("#previous").addClass("disabled");
-            postAction("next");
-        })
-
-        $("#previous").click(function (e) {
-            if ($(this).hasClass("disabled"))
-                return;
-
-            $(this).addClass("disabled");
-            $("#next").addClass("disabled");
-            postAction("previous");
+            $(this).text($(this).text() === "⌄" ? "⌃" : "⌄");
         })
 
         $("#quit").click(function (e) {
             if ($(this).hasClass("disabled"))
                 return;
+            $(this).addClass("disabled");
 
-            $("#quit").addClass("disabled");
-            $.ajax({
-                url: "{% url 'jplearn:test' %}",
-                method: "POST",
-                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-                data: JSON.stringify({
-                    "action": "quit"
-                }),
-                dataType: "json",
-            })
+            $.ajax(PostAsJson("", {
+                    "action": "quit",
+                }))
                 .done(function (json) {
                     if (json.status === 302) {
                         window.location.replace(json.location);
                     }
                 })
                 .fail(function () {
-                    $("#quit").removeClass("disabled")
-                })
+                    $(this).removeClass("disabled");
+                }.bind(this))
         })
 
         $("#toggleLightDark").click(function (e) {
@@ -507,48 +372,80 @@
             } else {
                 elem.text("Dark");
                 $("#body").css("background-color", "#f5f5f5");
-                $("#minCSS").attr("href", "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css")
-                    .attr("integrity", "sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm")
+                $("#minCSS").attr("href",
+                        "https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css")
+                    .attr("integrity",
+                        "sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm")
                     .attr("crossorigin", "anonymous");
                 $("#settingBtn").css("filter", "invert(50%)");
             }
         })
 
-        $("#favBtn").click(function (e) {
-            if ($(this).hasClass("disabled"))
+        $("#next").click(function (e) {
+            /*if ($(this).hasClass("disabled"))
                 return;
+
             $(this).addClass("disabled");
+            $("#previous").addClass("disabled");*/
+            dbc.move("left");
+        })
 
-            let m = $(this).data("status") == "0" ? "add" : "remove";
+        $("#previous").click(function (e) {
+            /*if ($(this).hasClass("disabled"))
+                return;
 
-            $.ajax({
-                url: "{% url 'jplearn:dictAction' %}",
-                method: "POST",
-                headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-                data: JSON.stringify({
-                    "target": localStorage.getItem('current_id'),
-                    "action": m,
-                }),
-                dataType: "json",
-            })
-                .done(function (json) {
-                    if (json.checkStatus) {
-                        $("#favBtn")
-                            .attr("src", "{% static 'jplearn/img/checked.png' %}")
-                            .css("filter", "opacity(100%)")
-                            .data("status", 1);
-                    } else {
-                        $("#favBtn")
-                            .attr("src", "{% static 'jplearn/img/unchecked.png' %}")
-                            .css("filter", "opacity(20%)")
-                            .data("status", 0);
+            $(this).addClass("disabled");
+            $("#next").addClass("disabled");*/
+            dbc.move("right");
+        })
+
+        var dbc;
+        $(document).ready(function () {
+            FavBtn("{% static 'jplearn/img/checked.png' %}", "{% static 'jplearn/img/unchecked.png' %}",
+                "{% url 'jplearn:dictAction' %}");
+            PlayBtn($("audio")[0]);
+            ModeSettingBlock();
+            WordCard();
+
+            dbc = new DisplayBlockContainer(
+                $("#displayBlock-container"), $(".wordCard")[0],
+                "{% static 'jplearn/audio' %}", modeChoiceCallback.bind($(".modeSettingBlock")[0]));
+
+            let im = new InputManager;
+            im
+                .on("moving", function (dx) {
+                    if (Math.abs(dx) > 10)
+                        dbc.locate(dx);
+                })
+                .on("move", function (direction) {
+                    // 0: up, 1: right, 2: down, 3: left
+                    switch (direction) {
+                        case 0:
+                            dbc.locate(0, 500);
+                            $(".wordCard").collapse("hide");
+                            break;
+                        case 1:
+                            dbc.move("right");
+                            break;
+                        case 2:
+                            dbc.locate(0, 500);
+                            $(".wordCard").collapse("show");
+                            break;
+                        case 3:
+                            dbc.move("left");
                     }
                 })
-                .fail(function (jqXHR, testStatus, err) {
+                .on("notmove", function () {
+                    dbc.locate(0, 500);
                 })
-                .always(function () {
-                    $("#favBtn").removeClass("disabled");
-                })
+
+
+
+
+
+            //console.log("this!");
+
+            //$("#info").empty().append(`cur1:${$("#card1").position().left}   cur2:${$("#card2").position().left}`)
         })
     </script>
 </body>
