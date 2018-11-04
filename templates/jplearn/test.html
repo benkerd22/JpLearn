@@ -76,14 +76,12 @@
         </nav>
     </div>
 
-    <audio src=""></audio>
-
     <div class="container-fluid pt-3">
         <div class="row justify-content-center">
             <div class="col-md-5 col-xl-3">
-                <div id="displayBlock-container" class="container-fluid mb-2" style="overflow:hidden; height: 120px;">
+                <div id="displayBlock-container" class="container-fluid mb-2 mx-0 px-0" style="overflow:hidden; height: 120px;">
 
-                    <div id="card-1" class="container my-0 p-0 displayBlock" style="position: relative; top:0px; left:-500px; height: 200px;">
+                    <div id="card-1" class="container my-0 px-2 displayBlock" style="position: relative; top:0px; left:-500px; height: 200px;">
                         <span class="card card-body">
                             <div class="row">
                                 <div class="col-auto pr-2">
@@ -92,27 +90,9 @@
                                     </div>
                                 </div>
                                 <div class="row align-items-center justify-content-center">
-                                    <div class="col"><button class="btn btn-light btn-sm disabled playBtn">▷</button></div>
+                                    <div class="col"><button class="btn btn-light btn-sm disabled invisible playBtn"></button></div>
                                 </div>
-                                <div class="col">
-                                    <img src="{% static 'jplearn/img/unchecked.png' %}" alt="add/remove" class="rounded float-right imgBtn"
-                                        data-status="0" data-target="">
-                                </div>
-                            </div>
-                        </span>
-                    </div>
-
-                    <div id="card0" class="container my-0 p-0 displayBlock" style="position: relative; top:-200px; left:0px; height: 200px;">
-                        <span class="card card-body">
-                            <div class="row">
-                                <div class="col-auto pr-2">
-                                    <div class="displayText" style="font-family: MYTTF">
-                                        <!-- To be displayed -->
-                                    </div>
-                                </div>
-                                <div class="row align-items-center justify-content-center">
-                                    <div class="col"><button class="btn btn-light btn-sm disabled playBtn">▷</button></div>
-                                </div>
+                                <audio src="" data-url="{% static 'jplearn/audio/' %}"></audio>
                                 <div class="col">
                                     <img src="{% static 'jplearn/img/unchecked.png' %}" alt="add/remove" class="rounded float-right favBtn"
                                         data-status="0" data-target="">
@@ -121,7 +101,27 @@
                         </span>
                     </div>
 
-                    <div id="card1" class="container my-0 p-0 displayBlock" style="position: relative; top:-400px; left:500px; height: 200px;">
+                    <div id="card0" class="container my-0 px-2 displayBlock" style="position: relative; top:-200px; left:0px; height: 200px;">
+                        <span class="card card-body">
+                            <div class="row">
+                                <div class="col-auto pr-2">
+                                    <div class="displayText" style="font-family: MYTTF">
+                                        <!-- To be displayed -->
+                                    </div>
+                                </div>
+                                <div class="row align-items-center justify-content-center">
+                                    <div class="col"><button class="btn btn-light btn-sm disabled invisible playBtn"></button></div>
+                                </div>
+                                <audio src="" data-url="{% static 'jplearn/audio/' %}"></audio>
+                                <div class="col">
+                                    <img src="{% static 'jplearn/img/unchecked.png' %}" alt="add/remove" class="rounded float-right favBtn"
+                                        data-status="0" data-target="">
+                                </div>
+                            </div>
+                        </span>
+                    </div>
+
+                    <div id="card1" class="container my-0 px-2 displayBlock" style="position: relative; top:-400px; left:500px; height: 200px;">
                         <span class="card card-body">
                             <div class="row">
                                 <div class="col-auto pr-2">
@@ -130,10 +130,11 @@
                                     </div>
                                 </div>
                                 <div class="row align-items-center justify-content-center">
-                                    <div class="col"><button class="btn btn-light btn-sm disabled playBtn">▷</button></div>
+                                    <div class="col"><button class="btn btn-light btn-sm disabled invisible playBtn"></button></div>
                                 </div>
+                                <audio src="" data-url="{% static 'jplearn/audio/' %}"></audio>
                                 <div class="col">
-                                    <img src="{% static 'jplearn/img/unchecked.png' %}" alt="add/remove" class="rounded float-right imgBtn"
+                                    <img src="{% static 'jplearn/img/unchecked.png' %}" alt="add/remove" class="rounded float-right favBtn"
                                         data-status="0" data-target="">
                                 </div>
                             </div>
@@ -143,8 +144,8 @@
                 </div>
 
                 <div class="container-fluid pb-2">
-                    <div id="progress_wrap" class="progress" style="height: 8px">
-                        <div id="progress" class="progress-bar bg-info" role="progressbar" style="width: 0%"
+                    <div id="progress" class="progress" style="height: 8px">
+                        <div class="progress-bar bg-info" role="progressbar" style="width: 0%"
                             aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                 </div>
@@ -196,14 +197,14 @@
                 </div>
 
                 <div class="container-fluid pb-2 my-4">
-                    <div class="collapse modeSettingBlock">
+                    <div id="modeSettingBlock" class="collapse modeSettingBlock">
                         <div class="row justify-content-end">
                             <div class="col"></div>
                             <div class="col-sm-auto">
                                 <div class="card card-body">
                                     <div class="row justify-content-center">
                                         <div class="col-auto text-center">
-                                            <button class="btn btn-sm btn-light modeBtn" data-target="0" id="kanjiCheck">漢字</button>
+                                            <button class="btn btn-sm btn-primary modeBtn" data-target="0" id="kanjiCheck">漢字</button>
                                         </div>
                                         <div class="col-auto text-center">
                                             <button class="btn btn-sm btn-light modeBtn" data-target="1">仮名</button>
@@ -266,7 +267,7 @@
                     <p class="font-weight-light h4">You have successfully finished a test containing <b id="wordCount"></b>
                         words!</p>
                     <hr>
-                    <div class="mb-0 font-weight-light h5">What about starting a new test?</div>
+                    <div class="mb-0 font-weight-light h5"></div>
                     <div class="row justify-content-end mt-3">
                         <div class="col flex-growth-1"></div>
                         <div class="col-auto">
@@ -290,53 +291,16 @@
 
     <script src="{% static 'jplearn/js/tools.js' %}"></script>
     <script src="{% static 'jplearn/js/inputManager.js' %}"></script>
-    <script src="{% static 'jplearn/js/favBtn.js' %}"></script>
-    <script src="{% static 'jplearn/js/playBtn.js' %}"></script>
-    <script src="{% static 'jplearn/js/modeSettingBlock.js' %}"></script>
-    <script src="{% static 'jplearn/js/displayBlock.js' %}"></script>
-    <script src="{% static 'jplearn/js/wordCard.js' %}"></script>
+    <script src="{% static 'jplearn/js/FavBtnManager.js' %}"></script>
+    <script src="{% static 'jplearn/js/PlayBtn.js' %}"></script>
+    <script src="{% static 'jplearn/js/ProgressBar.js' %}"></script>
+    <script src="{% static 'jplearn/js/ModeSettingBlock.js' %}"></script>
+    <script src="{% static 'jplearn/js/WordCard.js' %}"></script>
+    <script src="{% static 'jplearn/js/DisplayBlock.js' %}"></script>
+
 
     <script>
         "use strict"
-
-        /*
-                let refreshDisplay = function (json) {
-                    //localStorage.setItem('current_id', json.id);
-
-                    if (json.status == 'continue')
-                        $("#progress")
-                        .attr("aria-valuenow", json.current)
-                        .attr("aria-valuemax", json.max)
-                        .css("width", json.current * 100 / json.max + '%');
-                    else if (json.status == 'random_mode')
-                        $("#progress_wrap").addClass("d-none");
-
-
-                }
-
-                let postActionDone = function (json) {
-                    //console.log(json)
-
-                    if (json.status === "finish") {
-                        $("#progress")
-                            .attr("aria-valuenow", json.max)
-                            .attr("aria-valuemax", json.max)
-                            .css("width", '100%');
-
-                        $("#wordCount").text(json.max);
-                        $("#successAlert").modal("show");
-                        return;
-                    }
-
-                    if (json.status !== "not allowed") {
-                        
-                    }
-
-                    $("#next").removeClass("disabled");
-                    $("#previous").removeClass("disabled");
-                }*/
-
-
 
         $("#show").click(function (e) {
             $(this).text($(this).text() === "⌄" ? "⌃" : "⌄");
@@ -401,15 +365,12 @@
 
         var dbc;
         $(document).ready(function () {
-            FavBtn("{% static 'jplearn/img/checked.png' %}", "{% static 'jplearn/img/unchecked.png' %}",
-                "{% url 'jplearn:dictAction' %}");
-            PlayBtn($("audio")[0]);
-            ModeSettingBlock();
-            WordCard();
-
-            dbc = new DisplayBlockContainer(
-                $("#displayBlock-container"), $(".wordCard")[0],
-                "{% static 'jplearn/audio' %}", modeChoiceCallback.bind($(".modeSettingBlock")[0]));
+            let wordCard = new WordCard($("#wordCard"));
+            let progressbar = new ProgressBar($("#progress"));
+            let favBtnManager = new FavBtnManager($("#displayBlock-container"), "{% static 'jplearn/img/checked.png' %}", "{% static 'jplearn/img/unchecked.png' %}", "{% url 'jplearn:dictAction' %}")
+            let modeSettingBlock = new ModeSettingBlock($("#modeSettingBlock"));
+            
+            dbc = new DisplayBlockContainer($("#displayBlock-container"), wordCard, progressbar, favBtnManager, modeSettingBlock);
 
             let im = new InputManager;
             im
@@ -438,14 +399,6 @@
                 .on("notmove", function () {
                     dbc.locate(0, 500);
                 })
-
-
-
-
-
-            //console.log("this!");
-
-            //$("#info").empty().append(`cur1:${$("#card1").position().left}   cur2:${$("#card2").position().left}`)
         })
     </script>
 </body>

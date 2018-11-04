@@ -1,94 +1,63 @@
-let PlayBtn = function (relatedMedia) {
-    let media = relatedMedia;
+let PlayBtn = function (HTMLelement, audio) {
+    let self = this;
+    this.HTMLelement = HTMLelement;
 
-    $(".playBtn").click(function () {
+    this.staticUrl = $(audio).data("url");
+    this.audio = audio;
+
+    $(HTMLelement).click(function () {
         if ($(this).hasClass("disabled"))
             return;
 
-        $(this).addClass("disabled").text("♪");
-        autoRepeatTimes = 1;
-        $(media).trigger("play");
+        $(this)
+            .text("♪")
+            .addClass("disabled");
+
+        self.play();
     })
+}
 
-    $(".playBtn")
-        .on("playBtn:changeSrc", function (e, url) {
-            $(media)
-                .attr("src", url)
-                .trigger("load");
+PlayBtn.prototype.changesrc = function (url) {
+    let self = this,
+        btn = self.HTMLelement,
+        def = $.Deferred();
 
-            $(this).text("▷").addClass("disabled invisible");
-        })
-        .on("playBtn:play", function (e, repeatTimes) {
-            if (media.state >= 4) {
-                $(media).trigger("play");
-            } else {
-                $(media).on("canplaythrough", function() {
-                    $(media).trigger("play");
-                })
-            }
-        })
+    $(btn).addClass("disabled invisible");
 
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-        .on("playBtn:load", function (e, repeatTimes) {
-            repeatTimes = repeatTimes || 0;
-            $(this).on("canplaythrough", function() {
-                if (repeatTimes > 0) {
-
-                    $(media).on("ended", function() {
-                        $(this).trigger("canplaythrough");  // ??? is this needed?
-                    })
-
-                    repeatTimes--;
-                    $(this).addClass("disabled").text("♪");
-                    $(media).trigger("play");
-                } else {
-                    $(this).removeClass("disabled").text("▷");
-                }
-            })
-
-            $(media).trigger("load");
-        })
-
-    $(media)
-        .on("canplaythrough", function() {
-            $(".playBtn").trigger("canplaythrough");
-        })
-
-
-
-    $(media)
-        .on("pause", function () {
-            if (autoRepeatTimes == 0)
-                return;
-
-            autoRepeatTimes--;
-            if (autoRepeatTimes == 0) {
-                $("#play").removeClass("disabled").text("▷");
-            } else {
-                $(media).trigger("play");
-            }
-        })
-        .on("loadstart", function () {
-            $("#play").addClass("disabled invisible");
-        })
+    $(self.audio)
         .on("canplaythrough", function () {
-            $("#play").removeClass("disabled invisible");
-            if (autoRepeatTimes > 0) {
-                $("#play").addClass("disabled").text("♪");
+            $(btn)
+                .text("▷")
+                .removeClass("disabled invisible");
+            $(self.audio).off();
 
-                $(media).trigger("play");
-            }
-        })*/
+            def.resolve();
+        })
+        .attr("src", self.staticUrl + url)
+        .trigger("load");
+
+    return def.promise();
+}
+
+PlayBtn.prototype.play = function () {
+    let self = this,
+        btn = self.HTMLelement,
+        def = $.Deferred();
+
+    $(btn)
+        .text("♪")
+        .addClass("disabled");
+
+    $(self.audio)
+        .on("pause", function () {
+            $(btn)
+                .text("▷")
+                .removeClass("disabled");
+            $(self.audio).off();
+
+            def.resolve();
+        })
+        .trigger("play");
+
+    return def.promise();
 }

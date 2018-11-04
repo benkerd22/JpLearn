@@ -112,7 +112,7 @@
     <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/datatables.min.js"></script>
 
     <script src="{% static 'jplearn/js/tools.js' %}"></script>
-    <script src="{% static 'jplearn/js/favBtn.js' %}"></script>
+    <script src="{% static 'jplearn/js/FavBtnManager.js' %}"></script>
 
     <script>
         $(document).ready(function () {
@@ -149,47 +149,10 @@
                         render: data => `<span class="font-weight-light h6" style="font-family:''">${data}</span>`
                     },
                 ],
-
-                initComplete: function() {
-                    FavBtn("{% static 'jplearn/img/checked.png' %}", "{% static 'jplearn/img/unchecked.png' %}", "{% url 'jplearn:dictAction' %}");
-                }
             });
-/*
-            $("#dictionary").on("click", "button", function () {
-                if ($(this).hasClass("disabled"))
-                    return;
-                $(this).addClass("disabled");
 
-                let data = table.row($(this).parents('tr')).data();
-
-                let m = "";
-                if ($(this).hasClass("btn-success")) {
-                    $(this).removeClass("btn-success");
-                    m = "remove";
-                } else {
-                    $(this).removeClass("btn-light");
-                    m = "add";
-                }
-
-                $.ajax({
-                    url: "{% url 'jplearn:dictAction' %}",
-                    method: "POST",
-                    headers: { 'X-CSRFToken': '{{ csrf_token }}' },
-                    data: JSON.stringify({
-                        "target": data['id'],
-                        "action": m,
-                    }),
-                    dataType: "json",
-                })
-                    .done((function (json) {
-                        $(this).addClass(json.checked ? "btn-success" : "btn-light");
-                    }).bind(this))
-                    .fail(function (jqXHR, textStatus, err) {
-                    })
-                    .always((function () {
-                        $(this).removeClass("disabled");
-                    }).bind(this))
-            })*/
+            new FavBtnManager($("#dictionary"), "{% static 'jplearn/img/checked.png' %}", "{% static 'jplearn/img/unchecked.png' %}", "{% url 'jplearn:dictAction' %}")
+            
         })
     </script>
 </body>

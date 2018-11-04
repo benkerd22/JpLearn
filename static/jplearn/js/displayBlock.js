@@ -1,45 +1,68 @@
-let DisplayBlock = function (HTMLelement, urlAudio, modeChoice, margin, index) {
+let DisplayBlock = function (HTMLelement, favBtnManager, modeSettingBlock, margin, index) {
+    let block = $(HTMLelement);
+
     this.HTMLelement = HTMLelement;
-    this.width = $(HTMLelement).width() + margin;
-    this.urlAudio = urlAudio;
-    this.modeChoice = modeChoice;
+    this.text = block.find(".displayText");
+    this.favBtn = block.find(".favBtn");
+    this.playBtn = new PlayBtn(block.find(".playBtn"), block.find("audio")[0]);
+
+    this.favBtnManager = favBtnManager;
+    this.modeSettingBlock = modeSettingBlock;
+
+    this.width = block.width() + margin;
     this.index = index;
 
     this.data = null;
 }
 
-DisplayBlock.prototype.display = function () {
-    // load music ?
+// A jQuery Deferred object
+DisplayBlock.prototype.show = function () {
+    let self = this,
+        def = $.Deferred();
+
+    if (self.playBtn.autoplay) {
+        self.playBtn.promise
+            .then(function () {
+                return self.playBtn.play();
+            })
+            .then(function () {
+                return self.playBtn.play();
+            })
+            .then(def.resolve)
+    } else
+        def.resolve();
+
+    return def.promise();
 }
 
+// This is an instant function
 DisplayBlock.prototype.refresh = function (def) {
     let self = this,
-
         json = self.data,
-        text = $(self.HTMLelement).find(".displayText"),
-        playBtn = $(self.HTMLelement).find(".playBtn"),
-        favBtn = $(self.HTMLelement).find(".favBtn"),
-        choice = self.modeChoice();
+        choice = self.modeSettingBlock.getChoice();
 
     if (!json) {
         def.resolve();
         return;
     }
 
-    playBtn.trigger("playBtn:changeSrc", self.urlAudio + `/${json.gana}.mp3`);
-    favBtn.trigger(json.checked ? "favBtn:checked" : "favBtn:unchecked");
+    self.playBtn.promise = self.playBtn.changesrc(json.audio);
+    self.playBtn.autoplay = choice === 3;
+
+    self.favBtnManager.toggle(self.favBtn, json.checked);
+    self.favBtn.data("target", json.id);
 
     // 0:kanji  1:gana  2:chn  3:music
     switch (choice) {
         case 0:
-            text
+            self.text
                 .text(json.kanji)
                 .css("font-family", "MYTTF")
                 .removeClass("h2 lead")
                 .addClass("h1");
             break;
         case 1:
-            text
+            self.text
                 .empty()
                 .append(`${json.gana}<small>&nbsp;${json.tone}</small>`)
                 .css("font-family", "MYTTF")
@@ -47,14 +70,14 @@ DisplayBlock.prototype.refresh = function (def) {
                 .addClass((json.gana + json.tone).length >= 6 ? "h2" : "h1");
             break;
         case 2:
-            text
+            self.text
                 .text(json.chn)
                 .css("font-family", "")
                 .removeClass("h2")
                 .addClass("h1 lead");
             break;
         case 3:
-            text.text("");
+            self.text.text("");
     }
 
     def.resolve();
@@ -79,6 +102,8 @@ DisplayBlock.prototype.post = function (action) {
         })
         .fail(function (jqXHR, textStatus, err) {
             console.log(err);
+
+            def.reject();
         })
 
     return def.promise();
@@ -136,24 +161,31 @@ DisplayBlock.prototype.locate = function (x, duration) {
     return def.promise();
 }
 
-let DisplayBlockContainer = function (HTMLelement, wordCard, urlAudio, modeChoice) {
+
+// *****************************
+
+let DisplayBlockContainer = function (HTMLelement, wordCard, progressbar, favBtnManager, modeSettingBlock) {
     let self = this;
 
     self.blocks = [];
     $(HTMLelement).find(".displayBlock").each(function (index) {
         self.blocks.push(
-            new DisplayBlock(this, urlAudio, modeChoice, 60, index - 1)
+            new DisplayBlock(this, favBtnManager, modeSettingBlock, 60, index - 1)
         );
     })
 
-    self.current = 1;
     self.wordCard = wordCard;
+    self.progressbar = progressbar;
+    modeSettingBlock.onChange(self.refresh.bind(this));
+
+    self.current = 1;
     self.valid = false; // can accept action ?
 
     $.when(
-            self.blocks[self.current].post("new")
+            self.blocks[self.current]
+            .post("new")
             .then(function () {
-                $(wordCard).trigger("wordCard:refresh", [self.blocks[self.current].data]);
+                return self.wordCard.refresh(self.blocks[self.current].data)
             }),
             self.blocks[self.current - 1].post("prelast"),
             self.blocks[self.current + 1].post("prefetch"),
@@ -161,6 +193,52 @@ let DisplayBlockContainer = function (HTMLelement, wordCard, urlAudio, modeChoic
         .done(function () {
             self.valid = true;
         })
+}
+
+// A jQuery Deferred Object
+DisplayBlockContainer.prototype.post = function (direction) {
+    let self = this,
+        def = $.Deferred();
+
+    $.ajax(PostAsJson("", {
+            action: direction === "left" ? "next" : "previous",
+        }))
+        .done(function (json) {
+            switch (json.status) {
+                case "random_mode":
+                    self.progressbar.hide();
+                    def.resolve();
+                    break;
+
+                case "continue":
+                    self.progressbar
+                        .show()
+                        .val(json.current, json.max);
+                    def.resolve();
+                    break;
+
+                case "not allowed":
+                    def.reject("not allowed");
+                    break;
+
+                case "finish":
+                    self.progressbar
+                        .show()
+                        .val(json.max, json.max);
+
+                    $("#wordCount").text(json.max);
+                    $("#successAlert").modal("show"); // TODO: improve this
+
+                    def.reject("finished");
+            }
+        })
+        .fail(function (jqXHR, textStatus, err) {
+            console.log(err);
+
+            def.reject();
+        })
+
+    return def.promise();
 }
 
 DisplayBlockContainer.prototype.moveBlocks = function (dir) {
@@ -184,21 +262,21 @@ DisplayBlockContainer.prototype.locateBlocks = function (x, duration) {
 DisplayBlockContainer.prototype.locate = function (x, duration) {
     let self = this,
         cur = self.current,
-        dir = x > 0 ? 1 : -1;
+        dir = x > 0 ? 1 : (x === 0 ? 0 :-1);
 
     if (!self.valid)
         return;
-    
+
     cur = (cur + dir + 3) % 3;
     if (!self.blocks[cur].data) {
-        if (Math.abs(x) > 80)  // TODO: swipe seeing invalid block
+        if (Math.abs(x) > 80) // TODO: swipe seeing invalid block
             return;
     }
 
     self.valid = false;
     $.when(
-        ...self.locateBlocks(x, duration),
-    )
+            ...self.locateBlocks(x, duration),
+        )
         .done(function () {
             self.valid = true;
         })
@@ -212,25 +290,45 @@ DisplayBlockContainer.prototype.move = function (direction) {
     if (!self.valid)
         return;
 
-    cur = (cur + dir + 3) % 3;
-    if (!self.blocks[cur].data) {
-        self.locate(0, 500);
-        return;
-    }
-
     self.valid = false;
-    $.when(
-            ...self.moveBlocks(dir),
-            $.ajax(PostAsJson("", {
-                action: direction === "left" ? "next" : "previous",
-            }))
-            .then(function () {
-                return self.blocks[(cur + dir + 3) % 3].post(direction === "left" ? "prefetch" : "prelast");
-            }),
-            $(self.wordCard).trigger("wordCard:refresh", [self.blocks[cur].data])
-        )
+    cur = (cur + dir + 3) % 3;
+    self.current = cur;
+
+    self.post(direction)
         .done(function () {
-            self.valid = true;
-            self.current = cur;
+            $.when(
+                    ...self.moveBlocks(dir),
+                    self.blocks[cur].show(),
+                    self.wordCard.refresh(self.blocks[cur].data),
+                    self.blocks[(cur + dir + 3) % 3].post(direction === "left" ? "prefetch" : "prelast"),
+                )
+                .fail(function () {
+                    self.current = (cur - dir + 3) % 3;
+                })
+                .always(function () {
+                    self.valid = true;
+                })
         })
+        .fail(function (text) {
+            switch (text) {
+                case "not allowed":
+                    self.valid = true;
+                    self.current = (cur - dir + 3) % 3;
+                    self.locate(0, 500);
+                    break;
+                case "finished":
+                    break;
+                default:
+                    self.current = (cur - dir + 3) % 3;
+                    self.valid = true;
+            }
+        })
+}
+
+DisplayBlockContainer.prototype.refresh = function () {
+    let self = this,
+        cur = self.current;
+
+    self.blocks[(cur + 1) % 3].refresh($.Deferred());
+    self.blocks[(cur + 2) % 3].refresh($.Deferred());
 }

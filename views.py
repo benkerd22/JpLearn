@@ -8,7 +8,10 @@ from functools import wraps
 from django.shortcuts import render
 from django.http import *
 from django.urls import reverse_lazy
-from jplearn.models import Word
+from django.contrib.auth.models import User
+from jplearn.models import Realuser, Word, Book
+
+Share00 = Realuser.objects.get(user=User.objects.get(username='share00'))
 
 
 def login_(function=None, status=302):
@@ -33,6 +36,7 @@ def login_(function=None, status=302):
 
 def getRandom(request, action):
     user = request.user.realuser
+    user_book = user.books.first()
     status = request.session['dfa_status']
 
     # dfa logic:
@@ -59,15 +63,20 @@ def getRandom(request, action):
         # do the random selection
         selected_list = request.session['range']
 
-        if 0 in selected_list and not 1 in selected_list:
-            real_list = user.liked_words.all()
-        else:
-            real_list = Word.objects.all()
+        real_list = Word.objects.none()
+        for book_pk in selected_list:
+            book = Book.objects.get(pk=book_pk)
+            if book:
+                real_list = real_list | book.words.all()
+
+        real_list = real_list.difference(user.hate_words.all())
 
         word = random.choice(real_list)
 
-        request.session['last'] = request.session['current']  # save last word
-        request.session['current'] = word.pk  # save current word
+        if action in ('next', 'previous', 'new'):
+            # save last word
+            request.session['last'] = request.session['current']
+            request.session['current'] = word.pk  # save current word
 
     if status == 1:
         # show the current word
@@ -93,7 +102,7 @@ def getRandom(request, action):
     if action in ('next', 'previous'):
         request.session['dfa_status'] = status
         return JsonResponse({
-            'status': 'success',
+            'status': 'random_mode',
         })
 
     return JsonResponse({
@@ -102,13 +111,15 @@ def getRandom(request, action):
         'gana': word.gana,
         'tone': word.tone,
         'chn': word.chn,
+        'audio': word.related_audio,
         'id': word.pk,
-        'checked': word.realuser_set.filter(pk=user.pk).exists()
+        'checked': user_book.words.filter(pk=word.pk).exists()
     })
 
 
 def getRound(request, action):
     user = request.user.realuser
+    user_book = user.books.first()
 
     arrangment = request.session['arrangment']
     current = request.session['current']
@@ -131,9 +142,12 @@ def getRound(request, action):
         })
 
     if current == len(arrangment):
-        request.session['in_test'] = False
+        if action in ('next', 'previous'):
+            request.session['in_test'] = False
+
         return JsonResponse({
             'status': 'finish',
+            'current': len(arrangment),
             'max': len(arrangment),
         })
 
@@ -143,19 +157,20 @@ def getRound(request, action):
     if action in ('next', 'previous'):
         request.session['current'] = current
         return JsonResponse({
-            'status': 'success',
+            'status': 'continue',
+            'current': current,
+            'max': len(arrangment)
         })
 
     return JsonResponse({
         'status': 'continue',
-        'current': current,
-        'max': len(arrangment),
         'kanji': word.kanji,
         'gana': word.gana,
         'tone': word.tone,
         'chn': word.chn,
+        'audio': word.related_audio,
         'id': word.pk,
-        'checked': word.realuser_set.filter(pk=user.pk).exists()
+        'checked': user_book.words.filter(pk=word.pk).exists()
     })
 
 
@@ -192,7 +207,8 @@ def test(request):
             return HttpResponseBadRequest()
 
         return HttpResponseNotAllowed(['GET', 'POST'])
-    except:
+    except Exception as err:
+        print(err)
         return HttpResponseBadRequest()
 
 
@@ -203,20 +219,21 @@ def initTest(request):
     selected_list = data['selected_list']
     mode = data['mode']
 
-    all_words = Word.objects.all()
-    my_words = user.liked_words.all()
-    # Todo: create a WordList Model
-
-    if 0 in selected_list and not 1 in selected_list:
-        real_list = my_words
-    else:
-        real_list = all_words
-
     request.session['in_test'] = True
     if mode == 'round':
         request.session['mode'] = 'round'
+
+        real_list = Word.objects.none()
+        for book_pk in selected_list:
+            book = Book.objects.get(pk=book_pk)
+            if book:
+                real_list = real_list | book.words.all()
+
+        real_list = real_list.difference(user.hate_words.all())
+
         arrangment = [word.pk for word in real_list]
         random.shuffle(arrangment)
+
         request.session['arrangment'] = arrangment
         request.session['current'] = 0
     elif mode == 'random':
@@ -241,20 +258,25 @@ def start(request):
 
     if request.method == 'GET':
         if not in_test:
-            context = {
-                "exists_list": [
-                    {
-                        'name': 'My Book',
-                        'count': user.liked_words.all().count(),
-                        'valid': user.liked_words.all().count() > 0,
-                    },
-                    {
-                        'name': '《初级日语 一》(1-4)',
-                        'count': Word.objects.all().count(),
-                        'valid': True,
-                    }
-                ],
-            }
+            context = {"exists_list": []}
+
+            for book in user.books.all():
+                count = book.words.all().difference(user.hate_words.all()).count()
+                context['exists_list'].append({
+                    'id': book.pk,
+                    'name': book.name,
+                    'count': count,
+                    'valid': count > 0,
+                })
+
+            for book in Share00.books.all():
+                count = book.words.all().difference(user.hate_words.all()).count()
+                context['exists_list'].append({
+                    'id': book.pk,
+                    'name': book.name,
+                    'count': count,
+                    'valid': count > 0,
+                })
 
             return render(request, 'jplearn/start.html', context)
 
@@ -284,6 +306,7 @@ def dict(request):
 @login_(status=403)
 def dictData(request):
     user = request.user.realuser
+    user_book = user.books.first()
 
     res = {'data': [], }
 
@@ -294,7 +317,7 @@ def dictData(request):
             'gana': word.gana,
             'tone': word.tone,
             'chn': word.chn,
-            'checked': word.realuser_set.filter(pk=user.pk).exists()
+            'checked': user_book.words.filter(pk=word.pk).exists()
         }
         res['data'].append(row)
 
@@ -307,6 +330,7 @@ def dictAction(request):
         return HttpResponseNotAllowed(['POST'])
 
     user = request.user.realuser
+    user_book = user.books.first()
 
     try:
         data = json.loads(request.body.decode('utf-8'))
@@ -315,10 +339,10 @@ def dictAction(request):
 
         word = Word.objects.get(pk=wordpk)
         if action == 'add':
-            user.liked_words.add(word)
+            user_book.words.add(word)
             status = 1
         elif action == 'remove':
-            user.liked_words.remove(word)
+            user_book.words.remove(word)
             status = 0
         else:
             return HttpResponseBadRequest()
