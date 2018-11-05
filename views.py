@@ -144,7 +144,7 @@ def getRound(request, action):
     if current == len(arrangment):
         if action in ('next', 'previous'):
             request.session['in_test'] = False
-
+            
         return JsonResponse({
             'status': 'finish',
             'current': len(arrangment),

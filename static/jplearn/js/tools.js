@@ -17,3 +17,23 @@ let toggleClass = function (element, class0, class1) {
         $(element).removeClass(class1).addClass(class0);
     }
 }
+
+let Alert = function (HTMLelement) {
+    this.HTMLelement = HTMLelement;
+    this.text = $(HTMLelement).find("span");
+    this.retryBtn = $(HTMLelement).find("button");
+}
+
+Alert.prototype.alert = function (msg, callback) {
+    let self = this;
+
+    self.retryBtn.click(function () {
+        $(this).off();
+        $(self.HTMLelement).collapse("hide");
+
+        callback();
+    })
+
+    $(self.text).text(msg);
+    $(self.HTMLelement).collapse("show");
+}

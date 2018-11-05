@@ -1,4 +1,4 @@
-function InputManager() {
+function InputManager(scope) {
     this.events = {};
 
     if (window.navigator.msPointerEnabled) {
@@ -12,7 +12,7 @@ function InputManager() {
         this.eventTouchend = "touchend";
     }
 
-    this.listen();
+    this.listen(scope);
 }
 
 InputManager.prototype.on = function (event, callback) {
@@ -33,7 +33,7 @@ InputManager.prototype.emit = function (event, data) {
     }
 };
 
-InputManager.prototype.listen = function () {
+InputManager.prototype.listen = function (scope) {
     var self = this;
 
     var map = {
@@ -52,24 +52,23 @@ InputManager.prototype.listen = function () {
     };
 
     // Respond to direction keys
-    $(document).on("keydown", function (event) {
+    $(scope).on("keydown", function (event) {
         var modifiers = event.altKey || event.ctrlKey || event.metaKey ||
             event.shiftKey;
         var mapped = map[event.which];
 
         if (!modifiers) {
             if (mapped !== undefined) {
-                //event.preventDefault();
+                event.preventDefault();
                 self.emit("move", mapped);
             }
         }
     });
 
     // Respond to swipe events
-    var touchStartClientX, touchStartClientY,
-        touchLastClientX, touchLastClientY;
+    var touchStartClientX, touchStartClientY;
 
-    $(document).on(self.eventTouchstart, function (event) {
+    $(scope).on(self.eventTouchstart, function (event) {
         if ((!window.navigator.msPointerEnabled && event.touches.length > 1) ||
             event.targetTouches.length > 1) {
             return; // Ignore if touching with more than 1 finger
@@ -84,7 +83,7 @@ InputManager.prototype.listen = function () {
         }
     });
 
-    $(document).on(self.eventTouchmove, function (event) {
+    $(scope).on(self.eventTouchmove, function (event) {
         var touchClientX, touchClientY;
 
         if (window.navigator.msPointerEnabled) {
@@ -102,7 +101,7 @@ InputManager.prototype.listen = function () {
         touchLastClientY = touchClientY;
     });
 
-    $(document).on(self.eventTouchend, function (event) {
+    $(scope).on(self.eventTouchend, function (event) {
         if ((!window.navigator.msPointerEnabled && event.touches.length > 0) ||
             event.targetTouches.length > 0) {
             return; // Ignore if still touching with one or more fingers

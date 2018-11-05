@@ -19,10 +19,16 @@ class Book(models.Model):
     author = models.CharField(max_length=64)
     words = models.ManyToManyField(Word)
 
+    def __str__(self):
+        return self.name
+
 class Realuser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='realuser')
     books = models.ManyToManyField(Book)
     hate_words = models.ManyToManyField(Word)
+
+    def __str__(self):
+        return self.user.username
 
 @receiver(post_save, sender=User)
 def create_real_user(sender, instance, created, **kwargs):

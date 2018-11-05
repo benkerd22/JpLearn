@@ -100,10 +100,8 @@ DisplayBlock.prototype.post = function (action) {
 
             self.refresh(def); // promise will be resolve here
         })
-        .fail(function (jqXHR, textStatus, err) {
-            console.log(err);
-
-            def.reject();
+        .fail(function (jqXHR, textStatus) {
+            def.reject(textStatus);
         })
 
     return def.promise();
@@ -127,6 +125,8 @@ DisplayBlock.prototype.move = function (direction) {
             position: "relative",
         })
 
+        self.data = null; // mark as disabled, wait for post action from the container
+
         def.resolve();
     } else {
         // the block is still visible, so use animation
@@ -134,7 +134,7 @@ DisplayBlock.prototype.move = function (direction) {
             left: newindex * self.width,
             position: "relative",
         }, {
-            duration: 700,
+            duration: 600,
             complete: def.resolve
         })
     }
@@ -164,7 +164,7 @@ DisplayBlock.prototype.locate = function (x, duration) {
 
 // *****************************
 
-let DisplayBlockContainer = function (HTMLelement, wordCard, progressbar, favBtnManager, modeSettingBlock) {
+let DisplayBlockContainer = function (HTMLelement, wordCard, progressbar, favBtnManager, modeSettingBlock, alert) {
     let self = this;
 
     self.blocks = [];
@@ -176,6 +176,8 @@ let DisplayBlockContainer = function (HTMLelement, wordCard, progressbar, favBtn
 
     self.wordCard = wordCard;
     self.progressbar = progressbar;
+    self.alert = alert;
+
     modeSettingBlock.onChange(self.refresh.bind(this));
 
     self.current = 1;
@@ -193,13 +195,22 @@ let DisplayBlockContainer = function (HTMLelement, wordCard, progressbar, favBtn
         .done(function () {
             self.valid = true;
         })
+        .fail(function () {
+            self.alert.alert("Oops! The network is down. ", function () {
+                location.reload(false);
+            });
+        })
 }
 
 // A jQuery Deferred Object
 DisplayBlockContainer.prototype.post = function (direction) {
+    //post for general & new block
     let self = this,
+        cur = self.current,
+        dir = direction === "left" ? 1 : -1,
         def = $.Deferred();
 
+    cur = (cur + dir + 3) % 3;
     $.ajax(PostAsJson("", {
             action: direction === "left" ? "next" : "previous",
         }))
@@ -207,19 +218,17 @@ DisplayBlockContainer.prototype.post = function (direction) {
             switch (json.status) {
                 case "random_mode":
                     self.progressbar.hide();
-                    def.resolve();
                     break;
 
                 case "continue":
                     self.progressbar
                         .show()
                         .val(json.current, json.max);
-                    def.resolve();
                     break;
 
                 case "not allowed":
                     def.reject("not allowed");
-                    break;
+                    return;
 
                 case "finish":
                     self.progressbar
@@ -230,12 +239,14 @@ DisplayBlockContainer.prototype.post = function (direction) {
                     $("#successAlert").modal("show"); // TODO: improve this
 
                     def.reject("finished");
+                    return;
             }
-        })
-        .fail(function (jqXHR, textStatus, err) {
-            console.log(err);
 
-            def.reject();
+            self.current = cur;
+            def.resolve();
+        })
+        .fail(function (jqXHR, textStatus) {
+            def.reject(textStatus);
         })
 
     return def.promise();
@@ -262,7 +273,7 @@ DisplayBlockContainer.prototype.locateBlocks = function (x, duration) {
 DisplayBlockContainer.prototype.locate = function (x, duration) {
     let self = this,
         cur = self.current,
-        dir = x > 0 ? 1 : (x === 0 ? 0 :-1);
+        dir = x > 0 ? 1 : (x === 0 ? 0 : -1);
 
     if (!self.valid)
         return;
@@ -274,9 +285,7 @@ DisplayBlockContainer.prototype.locate = function (x, duration) {
     }
 
     self.valid = false;
-    $.when(
-            ...self.locateBlocks(x, duration),
-        )
+    $.when(...self.locateBlocks(x, duration))
         .done(function () {
             self.valid = true;
         })
@@ -287,41 +296,64 @@ DisplayBlockContainer.prototype.move = function (direction) {
         cur = self.current,
         dir = direction === "left" ? 1 : -1;
 
+    let post_with_retry = function () {
+        switch (self.stage) {
+            case 1:
+                retry1();
+                break;
+            case 2:
+                retry2();
+                break;
+            default:
+        }
+    }
+
+    let retry1 = function () {
+        self.post(direction)
+            .done(function () {
+                self.stage = 2;
+                post_with_retry();
+            })
+            .fail(function () {
+                self.alert.alert("Oops! The network is down. ", post_with_retry);
+            })
+    }
+
+    let retry2 = function () {
+        self.blocks[(cur + dir + 3) % 3].post(direction === "left" ? "prefetch" : "prelast")
+            .done(function () {
+                self.stage = 0;
+            })
+            .fail(function () {
+                self.alert.alert("Oops! The network is down. ", post_with_retry);
+            })
+    }
+
     if (!self.valid)
         return;
 
-    self.valid = false;
-    cur = (cur + dir + 3) % 3;
-    self.current = cur;
+    if (self.stage) {
+        self.locate(0, 500);
+        return;
+    }
 
-    self.post(direction)
+    cur = (cur + dir + 3) % 3;
+    if (!self.blocks[cur].data) {
+        return;
+    }
+
+    self.valid = false;
+    $.when(
+            ...self.moveBlocks(dir),
+            self.blocks[cur].show(),
+            self.wordCard.refresh(self.blocks[cur].data),
+            (function () {
+                self.stage = 1;
+                post_with_retry();
+            })()
+        )
         .done(function () {
-            $.when(
-                    ...self.moveBlocks(dir),
-                    self.blocks[cur].show(),
-                    self.wordCard.refresh(self.blocks[cur].data),
-                    self.blocks[(cur + dir + 3) % 3].post(direction === "left" ? "prefetch" : "prelast"),
-                )
-                .fail(function () {
-                    self.current = (cur - dir + 3) % 3;
-                })
-                .always(function () {
-                    self.valid = true;
-                })
-        })
-        .fail(function (text) {
-            switch (text) {
-                case "not allowed":
-                    self.valid = true;
-                    self.current = (cur - dir + 3) % 3;
-                    self.locate(0, 500);
-                    break;
-                case "finished":
-                    break;
-                default:
-                    self.current = (cur - dir + 3) % 3;
-                    self.valid = true;
-            }
+            self.valid = true;
         })
 }
 
