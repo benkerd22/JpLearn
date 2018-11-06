@@ -32,7 +32,14 @@
 
         @font-face {
             font-family: "MYTTF";
-            src: url("{% static 'jplearn/font/my.ttf' %}");
+            font-style: normal;
+            font-weight: 200;
+            src:
+                url("{% static 'jplearn/font/my.woff2' %}") format('woff2'),
+                url("{% static 'jplearn/font/my.woff' %}") format('woff'), 
+                url("{% static 'jplearn/font/my.ttf' %}") format('truetype'),
+                url("{% static 'jplearn/font/my.eot' %}") format('embedded-opentype');
+            unicode-range: U+A5, U+4E00-9FFF, U+3000-30FF, U+FF00-FF9F;
         }
     </style>
 </head>
@@ -181,6 +188,9 @@
                             <div class="container-fluid">
                                 <div class="h6 text-muted font-weight-light wordCard-chn">
                                 </div>
+                            </div>
+                            <div class="text-right font-weight-light mt-2">
+                                <a href="#" target="_blank">more..</a>
                             </div>
                         </div>
                     </div>

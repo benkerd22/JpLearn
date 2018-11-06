@@ -6,6 +6,7 @@ let WordCard = function (HTMLelement) {
     this.kanji = card.find(".wordCard-kanji");
     this.gana = card.find(".wordCard-gana");
     this.chn = card.find(".wordCard-chn");
+    this.link = card.find("a");
 
     this.data = null;
 }
@@ -38,6 +39,8 @@ WordCard.prototype.actuate = function (def) {
 
     self.chn.text(json.chn);
 
+    self.link.attr("href", "https://kotobank.jp/word/" + json.kanji);
+
     def.resolve();
 }
 
@@ -46,6 +49,9 @@ WordCard.prototype.refresh = function (json) {
     let self = this,
         card = $(self.HTMLelement),
         def = $.Deferred();
+
+    if (!json || json.status === "not allowed" || json.status === "finish")
+        return;
 
     self.data = json;
 

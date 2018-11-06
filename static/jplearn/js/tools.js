@@ -25,15 +25,22 @@ let Alert = function (HTMLelement) {
 }
 
 Alert.prototype.alert = function (msg, callback) {
-    let self = this;
-
-    self.retryBtn.click(function () {
-        $(this).off();
-        $(self.HTMLelement).collapse("hide");
-
-        callback();
-    })
+    let self = this,
+        alert = $(self.HTMLelement);
 
     $(self.text).text(msg);
-    $(self.HTMLelement).collapse("show");
+    $(alert)
+    .on("shown.bs.collapse", function () {
+        $(alert).off("shown.bs.collapse");
+        $(self.retryBtn).click(function () {
+            $(self.retryBtn).off();
+            $(alert)
+                .on("hidden.bs.collapse", function () {
+                    $(alert).off("hidden.bs.collapse");
+                    callback();
+                })
+                .collapse("hide");
+        })
+    })
+    .collapse("show");
 }

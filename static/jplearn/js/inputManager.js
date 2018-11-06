@@ -63,6 +63,11 @@ InputManager.prototype.listen = function (scope) {
                 self.emit("move", mapped);
             }
         }
+
+        // ESC key
+        if (!modifiers && event.which === 27) {
+            self.emit("esc", "");
+        }
     });
 
     // Respond to swipe events

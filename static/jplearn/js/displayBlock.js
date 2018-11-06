@@ -20,6 +20,11 @@ DisplayBlock.prototype.show = function () {
     let self = this,
         def = $.Deferred();
 
+    if (self.data.status === "finish") {
+        $("#successAlert").modal("show");
+        def.resolve();
+    }
+
     if (self.playBtn.autoplay) {
         self.playBtn.promise
             .then(function () {
@@ -41,7 +46,20 @@ DisplayBlock.prototype.refresh = function (def) {
         json = self.data,
         choice = self.modeSettingBlock.getChoice();
 
-    if (!json) {
+    if (!json || json.status === "not allowed") {
+        self.data = null;
+        self.text.empty().text("");
+        def.resolve();
+        return;
+    }
+
+    if (json.status === "finish") {
+        self.text
+                .text("完了")
+                .css("font-family", "MYTTF")
+                .removeClass("h2 lead")
+                .addClass("h1");
+        $(self.playBtn.HTMLelement).addClass("invisible");
         def.resolve();
         return;
     }
@@ -92,15 +110,13 @@ DisplayBlock.prototype.post = function (action) {
             action: action,
         }))
         .done(function (json) {
-            if (json.status === "not allowed")
-                self.data = null;
-            else {
-                self.data = json;
-            }
-
+            self.data = json;
             self.refresh(def); // promise will be resolve here
         })
         .fail(function (jqXHR, textStatus) {
+            self.data = null;
+            self.refresh($.Deferred()); // To clear the display block
+
             def.reject(textStatus);
         })
 
@@ -126,6 +142,7 @@ DisplayBlock.prototype.move = function (direction) {
         })
 
         self.data = null; // mark as disabled, wait for post action from the container
+        self.refresh($.Deferred()); // To clear the display block
 
         def.resolve();
     } else {
@@ -204,7 +221,7 @@ let DisplayBlockContainer = function (HTMLelement, wordCard, progressbar, favBtn
 
 // A jQuery Deferred Object
 DisplayBlockContainer.prototype.post = function (direction) {
-    //post for general & new block
+    //post for general
     let self = this,
         cur = self.current,
         dir = direction === "left" ? 1 : -1,
@@ -218,32 +235,29 @@ DisplayBlockContainer.prototype.post = function (direction) {
             switch (json.status) {
                 case "random_mode":
                     self.progressbar.hide();
+
+                    self.current = cur;
                     break;
 
                 case "continue":
                     self.progressbar
                         .show()
                         .val(json.current, json.max);
+                    $("#wordCount").text(json.max);
+
+                    self.current = cur;
                     break;
 
                 case "not allowed":
-                    def.reject("not allowed");
-                    return;
+                    break;
 
                 case "finish":
                     self.progressbar
                         .show()
                         .val(json.max, json.max);
-
-                    $("#wordCount").text(json.max);
-                    $("#successAlert").modal("show"); // TODO: improve this
-
-                    def.reject("finished");
-                    return;
             }
 
-            self.current = cur;
-            def.resolve();
+            def.resolve(json.status);
         })
         .fail(function (jqXHR, textStatus) {
             def.reject(textStatus);
@@ -273,9 +287,9 @@ DisplayBlockContainer.prototype.locateBlocks = function (x, duration) {
 DisplayBlockContainer.prototype.locate = function (x, duration) {
     let self = this,
         cur = self.current,
-        dir = x > 0 ? 1 : (x === 0 ? 0 : -1);
+        dir = x < 0 ? 1 : (x === 0 ? 0 : -1);
 
-    if (!self.valid)
+    if (!self.valid || self.stage)
         return;
 
     cur = (cur + dir + 3) % 3;
@@ -315,7 +329,9 @@ DisplayBlockContainer.prototype.move = function (direction) {
                 post_with_retry();
             })
             .fail(function () {
-                self.alert.alert("Oops! The network is down. ", post_with_retry);
+                setTimeout(function () {
+                    self.alert.alert("Oops! The network is down. ", post_with_retry);
+                }, 500);
             })
     }
 
@@ -325,36 +341,40 @@ DisplayBlockContainer.prototype.move = function (direction) {
                 self.stage = 0;
             })
             .fail(function () {
-                self.alert.alert("Oops! The network is down. ", post_with_retry);
+                setTimeout(function () {
+                    self.alert.alert("Oops! The network is down. ", post_with_retry);
+                }, 500);
             })
     }
 
-    if (!self.valid)
+    if (!self.valid) // the blocks are in animation
         return;
 
-    if (self.stage) {
+    if (self.stage) { // The user should click the "retry" first
         self.locate(0, 500);
         return;
     }
 
     cur = (cur + dir + 3) % 3;
-    if (!self.blocks[cur].data) {
+    if (!self.blocks[cur].data) { // Trying to see an invalid block
+        self.locate(0, 500);
         return;
     }
 
+    // Start animation
     self.valid = false;
     $.when(
             ...self.moveBlocks(dir),
             self.blocks[cur].show(),
             self.wordCard.refresh(self.blocks[cur].data),
-            (function () {
-                self.stage = 1;
-                post_with_retry();
-            })()
         )
         .done(function () {
             self.valid = true;
         })
+
+    // Start network confirm
+    self.stage = 1;
+    post_with_retry();
 }
 
 DisplayBlockContainer.prototype.refresh = function () {
