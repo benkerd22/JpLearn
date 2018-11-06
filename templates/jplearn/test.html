@@ -241,7 +241,7 @@
                         <div class="row justify-content-end my-3">
                             <div class="col flex-growth-1"></div>
                             <div class="col-auto">
-                                <div class="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#quitConfirm">quit</div>
+                                <div id="tryQuit" class="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#quitConfirm">quit</div>
                             </div>
                         </div>
                     </div>
@@ -309,7 +309,7 @@
         crossorigin="anonymous"></script>
 
     <script src="{% static 'jplearn/js/tools.js' %}"></script>
-    <script src="{% static 'jplearn/js/inputManager.js' %}"></script>
+    <script src="{% static 'jplearn/js/InputManager.js' %}"></script>
     <script src="{% static 'jplearn/js/FavBtnManager.js' %}"></script>
     <script src="{% static 'jplearn/js/PlayBtn.js' %}"></script>
     <script src="{% static 'jplearn/js/ProgressBar.js' %}"></script>
@@ -403,6 +403,9 @@
                 })
                 .on("notmove", function () {
                     dbc.locate(0, 500);
+                })
+                .on("esc", function () {
+                    $("#tryQuit").click();
                 })
 
             const clickEvent = (function () {
