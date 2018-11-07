@@ -41,6 +41,13 @@
                 url("{% static 'jplearn/font/my.eot' %}") format('embedded-opentype');
             unicode-range: U+A5, U+4E00-9FFF, U+3000-30FF, U+FF00-FF9F;
         }
+
+        .navbar a {
+            transition: ease-in-out color .15s;
+        }
+        .navbar a:hover {
+            text-decoration: none;
+        }
     </style>
 </head>
 
@@ -223,7 +230,7 @@
                                 <div class="card card-body">
                                     <div class="row justify-content-center">
                                         <div class="col-auto text-center">
-                                            <button class="btn btn-sm btn-primary modeBtn" data-target="0" id="kanjiCheck">漢字</button>
+                                            <button class="btn btn-sm btn-primary modeBtn" data-target="0">漢字</button>
                                         </div>
                                         <div class="col-auto text-center">
                                             <button class="btn btn-sm btn-light modeBtn" data-target="1">仮名</button>
