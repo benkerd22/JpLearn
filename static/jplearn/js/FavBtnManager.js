@@ -42,6 +42,8 @@ FavBtnManager.prototype.clickHandler = function (HTMLelement) {
     if (btn.hasClass("disabled"))
         return;
     btn.addClass("disabled");
+    self.toggle(btn, !btn.data("checked"));
+    btn.data("checked", !btn.data("checked"));
 
     $.ajax(PostAsJson(self.urlAction, {
             "target": btn.data("target"),
