@@ -68,7 +68,7 @@
 
                     <div id="list" class="list-group mt-3">
                         {% for list in exists_list %}
-                        <a href="#" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if not list.valid %}disabled{% endif %}"
+                        <a href="" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center {% if not list.valid %}disabled{% endif %}"
                             data-id="{{ list.id }}">
                             {{ list.name }}<span class="badge badge-secondary badge-pill">{{ list.count }}</span>
                         </a>
