@@ -9,6 +9,7 @@ urlpatterns = [
 
     path('login/', auth_views.LoginView.as_view(template_name='jplearn/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(template_name='jplearn/logout.html'), name='logout'),
+    path('guest/', views.guestlogin, name='guest'),
 
     path('start/', views.start, name='start'),
     path('test/', views.test, name='test'),
