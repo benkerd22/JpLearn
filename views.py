@@ -10,7 +10,7 @@ from django.http import *
 from django.urls import reverse_lazy
 from django.contrib.auth.models import User
 from jplearn.models import Realuser, Word, Book
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 
 Share00 = Realuser.objects.get(user=User.objects.get(username='share00'))
 
@@ -354,7 +354,8 @@ def dictAction(request):
 
 def guestlogin(request):
     if request.user.is_authenticated:
-        return HttpResponseRedirect('/')
+        logout(request)
     
     guest = User.objects.get(username='guest')
     login(request, guest)
+    return HttpResponseRedirect(str(reverse_lazy('jplearn:start')))
