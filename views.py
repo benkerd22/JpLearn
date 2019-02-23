@@ -112,6 +112,7 @@ def getRandom(request, action):
         'gana': word.gana,
         'tone': word.tone,
         'chn': word.chn,
+        'type': word.type,
         'audio': word.related_audio,
         'id': word.pk,
         'checked': user_book.words.filter(pk=word.pk).exists()
@@ -169,6 +170,7 @@ def getRound(request, action):
         'gana': word.gana,
         'tone': word.tone,
         'chn': word.chn,
+        'type': word.type,
         'audio': word.related_audio,
         'id': word.pk,
         'checked': user_book.words.filter(pk=word.pk).exists()

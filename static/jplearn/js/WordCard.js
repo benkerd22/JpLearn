@@ -37,7 +37,7 @@ WordCard.prototype.actuate = function (def) {
 
     self.gana.empty().append(`${json.gana}&nbsp;${json.tone}`);
 
-    self.chn.text(json.chn);
+    self.chn.empty().append(json.type === '' ? json.chn : `[${json.type}]&nbsp;${json.chn}`);
 
     self.link.attr("href", "https://kotobank.jp/word/" + json.kanji);
 
